@@ -132,16 +132,10 @@
                         <mxPoint x="223" y="286" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="41" value="" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#F0F0F0;fontSize=12;fillColor=#18141D;" parent="1" vertex="1">
-                    <mxGeometry x="124" y="406" width="120" height="60" as="geometry"/>
-                </mxCell>
-                <mxCell id="42" value="Dia da Semana" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#F0F0F0;fontSize=18;fillColor=#18141D;" parent="1" vertex="1">
-                    <mxGeometry x="129" y="411" width="110" height="50" as="geometry"/>
-                </mxCell>
-                <mxCell id="50" value="" style="endArrow=none;html=1;fontSize=18;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="44" target="41" edge="1">
+                <mxCell id="50" value="" style="endArrow=none;html=1;fontSize=18;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="44" edge="1">
                     <mxGeometry width="50" height="50" relative="1" as="geometry">
                         <mxPoint x="173" y="336" as="sourcePoint"/>
-                        <mxPoint x="223" y="286" as="targetPoint"/>
+                        <mxPoint x="124" y="436" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
                 <mxCell id="51" value="" style="endArrow=none;html=1;fontSize=18;entryX=0.5;entryY=1;entryDx=0;entryDy=0;exitX=0.678;exitY=0.005;exitDx=0;exitDy=0;exitPerimeter=0;" parent="1" source="6" target="112" edge="1">
@@ -480,8 +474,14 @@
                 <mxCell id="150" value="&lt;span style=&quot;&quot;&gt;&lt;b&gt;Projeto BD - Parte 1&lt;/b&gt;&lt;/span&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;" vertex="1" parent="1">
                     <mxGeometry y="9" width="850" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="153" value="Manuel Soares Eleutério da Silva - 106001 - 33.3% - 20h&lt;br&gt;João Tomás de Almeida Santos Antunes Gomes - 10620 - 20h4 - 33.3%&lt;br&gt;Sofia Dinis Pinto Piteira - 106194 - 33.3% - 20h&lt;br&gt;Grupo:&lt;br&gt;Turno:&lt;br&gt;Professor:" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=17;" vertex="1" parent="1">
+                <mxCell id="153" value="Manuel Soares Eleutério da Silva - 106001 - 33.3% - 20h&lt;br&gt;João Tomás de Almeida Santos Antunes Gomes - 10620 - 20h4 - 33.3%&lt;br&gt;Sofia Dinis Pinto Piteira - 106194 - 33.3% - 20h&lt;br&gt;Grupo: 62&lt;br&gt;Turno: LEIC-T0204&lt;br&gt;Professor: Flávio Martins" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=17;" vertex="1" parent="1">
                     <mxGeometry x="18" y="43.5" width="850" height="121" as="geometry"/>
+                </mxCell>
+                <mxCell id="154" value="" style="rounded=0;whiteSpace=wrap;html=1;fontSize=17;" vertex="1" parent="1">
+                    <mxGeometry x="124" y="405" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="155" value="Dia da&lt;br&gt;semana" style="rounded=0;whiteSpace=wrap;html=1;fontSize=17;" vertex="1" parent="1">
+                    <mxGeometry x="129" y="410" width="110" height="50" as="geometry"/>
                 </mxCell>
             </root>
         </mxGraphModel>
