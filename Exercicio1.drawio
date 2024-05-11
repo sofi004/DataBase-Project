@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="Vmk2Yes_UuU7IunLGzfF" name="Page-1">
-        <mxGraphModel dx="1073" dy="580" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="894" dy="473" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -474,14 +474,14 @@
                         <mxPoint x="310" y="1006" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="177" value="Restrições de Integridade:&lt;br&gt;RI-1: O número de telefóne da clinica é único&lt;br&gt;RI-2: A morada da clinica é única&amp;nbsp;&lt;br&gt;RI-3: A especialidade do médico é escolhida de uma lista de especialidades reconhecidas pela ordem dos médicos&lt;br&gt;RI-4: O médico só está alocado a clinicas em dias úteis&lt;br&gt;RI-5: Só existem consultas das 8:00h às 20:00h&lt;br&gt;RI-6: As consultas estão agendadas para terminarem 30 minutos após a hora de início&lt;br&gt;RI-7: O nome do sintoma é escolhido de uma lista proveniente do vocabulário controlado SNOMED CT&lt;br&gt;RI-8: O nome do medicamento é escolhido da lista oficial do Infarmed" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;" parent="1" vertex="1">
-                    <mxGeometry x="23.5" y="1110" width="760" height="250" as="geometry"/>
+                <mxCell id="177" value="Restrições de Integridade:&lt;br&gt;&lt;br&gt;RI-1: O número de telefóne da clinica é único&lt;br&gt;RI-2: A morada da clinica é única&amp;nbsp;&lt;br&gt;RI-3: A especialidade do médico é escolhida de uma lista de especialidades reconhecidas pela ordem dos médicos&lt;br&gt;RI-4: O médico só está alocado a clinicas em dias úteis&lt;br&gt;RI-5: Só existem consultas das 8:00h às 20:00h&lt;br&gt;RI-6: As consultas estão agendadas para terminarem 30 minutos após a hora de início&lt;br&gt;RI-7: O nome do sintoma é escolhido de uma lista proveniente do vocabulário controlado SNOMED CT&lt;br&gt;RI-8: O nome do medicamento é escolhido da lista oficial do Infarmed" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;" parent="1" vertex="1">
+                    <mxGeometry x="17.5" y="1110" width="760" height="250" as="geometry"/>
                 </mxCell>
                 <mxCell id="178" value="&lt;b&gt;1 . MODELAÇÃO ENTIDADE-ASSOCIAÇÃO&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;" parent="1" vertex="1">
                     <mxGeometry x="20" y="157.5" width="780" height="30" as="geometry"/>
                 </mxCell>
                 <mxCell id="179" value="&lt;b&gt;2 . CONVERSÃO E-A-RELACIONAL&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;" parent="1" vertex="1">
-                    <mxGeometry x="18" y="1373" width="780" height="30" as="geometry"/>
+                    <mxGeometry x="18" y="1386" width="780" height="30" as="geometry"/>
                 </mxCell>
                 <mxCell id="180" value="" style="rhombus;whiteSpace=wrap;html=1;fontSize=18;" parent="1" vertex="1">
                     <mxGeometry x="723" y="700" width="40" height="40" as="geometry"/>
@@ -806,6 +806,45 @@
                 </mxCell>
                 <mxCell id="271" value="RI-8" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
                     <mxGeometry x="620" y="1013" width="60" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="274" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;∏&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="43" y="2330" width="60" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="275" value="&lt;b&gt;&lt;font style=&quot;font-size: 18px;&quot;&gt;3. Álgebra Relacional &amp;amp; SQL&lt;/font&gt;&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="40.75" y="2250" width="759.25" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="276" value="1. " style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;" vertex="1" parent="1">
+                    <mxGeometry x="39" y="2290" width="60" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="278" value="&lt;font style=&quot;font-size: 13px;&quot;&gt;SSN, especialidade&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;" vertex="1" parent="1">
+                    <mxGeometry x="60" y="2340" width="160" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="279" value="( medico&amp;nbsp;&lt;font style=&quot;font-size: 18px;&quot;&gt;⨝&lt;/font&gt;&amp;nbsp;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=13;" vertex="1" parent="1">
+                    <mxGeometry x="189" y="2329" width="83" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="280" value="&lt;font style=&quot;font-size: 10px;&quot;&gt;medico.NIF = consulta.NIF&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;" vertex="1" parent="1">
+                    <mxGeometry x="239" y="2336" width="160" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="281" value="consulta )&amp;nbsp;&lt;font style=&quot;font-size: 16px;&quot;&gt;÷&lt;/font&gt;&amp;nbsp;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=13;" vertex="1" parent="1">
+                    <mxGeometry x="373.75" y="2326" width="83" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="282" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;∏&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="431" y="2324" width="60" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="283" value="&lt;span style=&quot;font-size: 10px;&quot;&gt;especialidade&lt;/span&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;" vertex="1" parent="1">
+                    <mxGeometry x="421" y="2332" width="160" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="284" value="( medico )" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=13;" vertex="1" parent="1">
+                    <mxGeometry x="523.5" y="2324" width="83" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="285" value="2. " style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;" vertex="1" parent="1">
+                    <mxGeometry x="39" y="2370" width="60" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="286" value="Quais são as especialidade de médicos que têm o maior némero de consultas ?" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;" vertex="1" parent="1">
+                    <mxGeometry x="50" y="2400" width="600" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="287" value="3." style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;" vertex="1" parent="1">
+                    <mxGeometry x="39" y="2450" width="60" height="30" as="geometry"/>
                 </mxCell>
             </root>
         </mxGraphModel>
