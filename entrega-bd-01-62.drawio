@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="Vmk2Yes_UuU7IunLGzfF" name="Page-1">
-        <mxGraphModel dx="894" dy="473" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="1073" dy="495" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -843,11 +843,17 @@
                 <mxCell id="286" value="Quais são as especialidade de médicos que têm o maior némero de consultas ?" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;" parent="1" vertex="1">
                     <mxGeometry x="50" y="2400" width="600" height="40" as="geometry"/>
                 </mxCell>
-                <mxCell id="287" value="3." style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;" parent="1" vertex="1">
-                    <mxGeometry x="39" y="2450" width="60" height="30" as="geometry"/>
+                <mxCell id="287" value="4." style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;" parent="1" vertex="1">
+                    <mxGeometry x="39" y="2550" width="60" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="288" value="&lt;span style=&quot;font-size: 16px;&quot;&gt;No contexto do problema, os joins iniciais fazem sentido, no entanto, os filtros aplicados às tabelas resultantes dos mesmos não refletem um bom calculo da proporção de fidelidade, pois vão apenas buscar a primeira consulta do paciente, não só não considerando o número de vezes que os pacientes frequentam consultas com o médico, mas também não tendo em conta consultas com outros medicos da mesma especialidade.&lt;br&gt;Na realidade o código SQL devia ter em atenção o número de consultas que um paciente teve com um médico de uma especialidade, relativamente ao número de consultas que teve com todos os médicos dessa especialidade e repetir isto para todos os pacientes do médico fazendo no final a média, de modo a obter a proporção de fidelidade de cada médico.&lt;br&gt;&lt;/span&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
-                    <mxGeometry x="72" y="2480" width="728" height="190" as="geometry"/>
+                <mxCell id="288" value="&lt;span style=&quot;font-size: 16px;&quot;&gt;No contexto do problema, os joins iniciais fazem sentido, no entanto, os filtros aplicados às tabelas resultantes dos mesmos não refletem um bom calculo da proporção de fidelidade, pois vão apenas buscar a primeira consulta do paciente, não só não considerando o número de vezes que os pacientes frequentam consultas com o médico, mas também não tendo em conta consultas com outros medicos da mesma especialidade.&lt;br&gt;Na realidade o código SQL devia ter em atenção o número de consultas que um paciente teve com um médico de uma especialidade, relativamente ao número de consultas que teve com todos os médicos dessa especialidade e repetir isto para todos os pacientes do médico fazendo no final a média, de modo a obter a proporção de fidelidade de cada médico.&lt;br&gt;&lt;/span&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+                    <mxGeometry x="72" y="2580" width="728" height="190" as="geometry"/>
+                </mxCell>
+                <mxCell id="289" value="3. " style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;" vertex="1" parent="1">
+                    <mxGeometry x="39" y="2456" width="60" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="290" value="Qual o nome e o SSN dos pacientes que tiveram mais que uma consulta no mesmo dia?" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;" vertex="1" parent="1">
+                    <mxGeometry x="50" y="2486" width="660" height="40" as="geometry"/>
                 </mxCell>
             </root>
         </mxGraphModel>
