@@ -1,6 +1,7 @@
 import random
 import string
 import datetime
+import copy
 
 # Funçao para gerar números de telefone aleatórios
 def generate_phone_number():
@@ -146,57 +147,64 @@ for _ in range(5000):
         "data_nasc": generate_birth_date()
     })
 
-def dia_do_ano_para_dia_da_semana(ano, dia_do_ano):
-    data = datetime.date(ano, 1, 1) + datetime.timedelta(days=dia_do_ano - 1)
-    # weekday() retorna 0 para segunda-feira até 6 para domingo
-    # Ajustar para retornar 1 para segunda-feira até 7 para domingo
-    return (data.weekday() + 1) % 7 + 1
+# Definindo o número mínimo de consultas por médico por dia
+min_consultas_por_medico = 2
 
-# Dados para as consultas
-consultas = []  # Inicialize a lista de consultas
+# Definindo o número mínimo de consultas por dia por clínica
+min_consultas_por_dia_por_clinica = 20
 
 # Intervalo de tempo para as consultas
 inicio_2023 = datetime.date(2023, 1, 1)
 fim_2024 = datetime.date(2024, 12, 31)
 
-# Conjunto para rastrear códigos de consulta utilizados
+# Schedule patients consultations
+consultas = []  # Inicialize a lista de consultas
+codigos_consulta = set()  # Conjunto para rastrear códigos de consulta utilizados
 codigos_consulta = set()
-nr_pacientes = 0
-while nr_pacientes != 5000:
+id = 0
+paciente_nr = 0
+while id < 5000:
     current_date = inicio_2023
     while current_date <= fim_2024:
-        dia = current_date.day
-        ano = current_date.year
-        dia_semana = dia_do_ano_para_dia_da_semana(ano, dia)
+        dia = current_date.weekday() + 1
         for clinica in clinicas:
             nr_consultas = 0
             while nr_consultas < 20:
                 nr_consultas_por_medico = 0
                 while nr_consultas_por_medico < 2:
-                    for medico, clinica_trabalha, dia_trabalha in trabalha_data:
-                        if (clinica_trabalha == clinica) and (dia_trabalha == dia_semana):
+                    for trabalha in trabalha_data:
+                        if(nr_consultas >= 20):
+                            break
+                        if (trabalha["nome_clinica"] == clinica["nome"]) and (trabalha["dia_da_semana"] == dia):
+                            medico = trabalha["nif_medico"]
                             # Gerar um código único de consulta
                             codigo_sns = ''.join(random.choices(string.digits, k=12))
                             while codigo_sns in codigos_consulta:
                                 codigo_sns = ''.join(random.choices(string.digits, k=12))
-                            
                             # Gerar uma hora aleatória para a consulta
                             hora_consulta = datetime.time(random.randint(8, 17), random.randint(0, 59))
+                            if paciente_nr >= 5000:
+                                paciente_nr = 0
                             consultas.append({
-                                "ssn": pacientes[nr_pacientes]["ssn"],
+                                "id": id,
+                                "ssn": pacientes[paciente_nr]["ssn"],
                                 "nif_medico": medico,
-                                "nome_clinica": clinica,
+                                "nome_clinica": trabalha["nome_clinica"],
                                 "data": current_date,
                                 "hora": hora_consulta,
                                 "codigo_sns": codigo_sns
                             })
                             nr_consultas += 1
-                            nr_pacientes += 1
+                            paciente_nr += 1
+                            id += 1
                             # Adicionar o código de consulta à lista de códigos utilizados
                             codigos_consulta.add(codigo_sns)
                     nr_consultas_por_medico += 1
         # Passar para o próximo dia
         current_date += datetime.timedelta(days=1)
+    if(id >= 5000):
+        break
+
 
 # Dados para as receitas
 receitas = [
@@ -236,7 +244,7 @@ with open("dados.sql", "w") as f:
     
     # Preencher a tabela consulta
     f.write("INSERT INTO consulta (ssn, nif, nome, data, hora, codigo_sns) VALUES\n")
-    f.write(",\n".join(["('{}', '{}', '{}', '{}', '{}', '{}')".format(consulta['ssn'], consulta['nif_medico'], consulta['nome_clinica'], consulta['data'], consulta['hora'], consulta['codigo_sns']) for consulta in consultas]) + ";\n")
+    f.write(",\n".join(["('{}', '{}', '{}', '{}', '{}', '{}')".format(consulta['id'], consulta['ssn'], consulta['nif_medico'], consulta['nome_clinica'], consulta['data'], consulta['hora'], consulta['codigo_sns']) for consulta in consultas]) + ";\n")
     
     # Preencher a tabela receita
     f.write("INSERT INTO receita (codigo_sns, medicamento, quantidade) VALUES\n")
