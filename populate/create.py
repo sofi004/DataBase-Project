@@ -182,7 +182,21 @@ while id < 5000:
                             while codigo_sns in codigos_consulta:
                                 codigo_sns = ''.join(random.choices(string.digits, k=12))
                             # Gerar uma hora aleatória para a consulta
-                            hora_consulta = datetime.time(random.randint(8, 17), random.randint(0, 59))
+                            hora_aleatoria = datetime.time(random.randint(8, 19), random.choice([0, 30]))
+
+                            # Verificar se a hora aleatória está dentro dos intervalos permitidos
+                            hora_consulta = None
+                            if 8 <= hora_aleatoria.hour < 13 or 14 <= hora_aleatoria.hour < 19:
+                                minutos = hora_aleatoria.minute // 30 * 30  # Ajustar para o intervalo de meia hora
+                                hora_consulta = datetime.time(hora_aleatoria.hour, minutos)
+                            else:
+                                # Se estiver fora dos intervalos 8-13 e 14-19 horas, ajuste para o intervalo mais próximo
+                                if hora_aleatoria.hour < 8:
+                                    hora_consulta = datetime.time(8, 0)  # Ajuste para o início do intervalo
+                                elif hora_aleatoria.hour >= 19:
+                                    hora_consulta = datetime.time(19, 0)  # Ajuste para o final do intervalo
+                                elif hora_aleatoria.hour >= 13 and hora_aleatoria.hour < 14:
+                                    hora_consulta = datetime.time(15, 30)
                             if paciente_nr >= 5000:
                                 paciente_nr = 0
                             consultas.append({
