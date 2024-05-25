@@ -76,7 +76,71 @@ def list_clinics():
     return jsonify(clinics), 200
 
 
-'''@app.route("/", methods=("GET",))
+@app.route("/c/<clinica>/", methods=("GET",))
+
+def list_especialidades_clinica(clinica):
+    "Mostra as especialidades de uma clinica"
+    with pool.connection() as conn:
+        with conn.cursor() as cur:
+            especialidades = cur.execute(
+                """
+                SELECT DISTINCT especialidade
+                FROM trabalha t
+                JOIN medico m on m.nif = t.nif
+                JOIN clinica c ON t.nome = c.nome
+                WHERE c.nome = %(clinica)s;
+                """,
+                {"clinica": clinica},
+            ).fetchall()
+            log.debug(f"Found {cur.rowcount} rows.")
+
+    return jsonify(especialidades), 200
+
+@app.route("/c/<clinica>/<especialidade>/", methods=("GET",))
+
+def list_horarios_medicos_clinica(clinica, especialidade):
+    "Lista os médicos da clinia e da especialidade disponiveis"
+    with pool.connection() as conn:
+        with conn.cursor() as cur:
+            especialidades = cur.execute(
+                """
+                WITH horarios_disponiveis AS (
+                SELECT
+                    m.nome AS nome_medico,
+                    c.data AS data_disponivel,
+                    c.hora AS hora_disponivel
+                FROM
+                    medico m
+                JOIN
+                    trabalha t ON m.nif = t.nif
+                JOIN
+                    clinica cl ON t.nome = cl.nome
+                LEFT JOIN
+                    consulta c ON m.nif = c.nif AND c.data >= CURRENT_DATE AND c.hora >= CURRENT_TIME
+                WHERE
+                    cl.nome = %(clinica)s
+                    AND m.especialidade = %(especialidade)s
+                    AND c.id IS NULL
+                ORDER BY
+                    c.data, c.hora
+            )
+            SELECT
+                nome_medico,
+                data_disponivel,
+                hora_disponivel
+            FROM
+                horarios_disponiveis
+            LIMIT 3;
+
+                """,
+                {"clinica": clinica, "especialidade": especialidade},
+            ).fetchall()
+            log.debug(f"Found {cur.rowcount} rows.")
+
+    return jsonify(especialidades), 200
+
+'''
+@app.route("/", methods=("GET",))
 @app.route("/accounts", methods=("GET",))
 def account_index():
     """Show all the accounts, most recent first."""

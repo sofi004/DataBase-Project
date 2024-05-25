@@ -10,6 +10,3 @@
 
 --INSERT INTO medico (nif, nome, telefone, morada, especialidade)
 --VALUES ('987654321', 'Dr. Pedro Silva', '9876543210', 'Rua das Flores, 123', 'Pediatria');
-
---INSERT INTO trabalha (nif, nome, dia_da_semana)
---VALUES ('987654321', 'Nome_da_Clinica', 1);
