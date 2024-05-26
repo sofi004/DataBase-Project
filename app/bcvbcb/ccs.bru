@@ -4,8 +4,15 @@ meta {
   seq: 3
 }
 
-post {
-  url: 
+delete {
+  url: http://127.0.0.1:8080/a/o_caralho/cancelar/?nif_medico=987654321&data=12/07/2024&hora=12:00&ssn_paciente=12345678901
   body: none
   auth: none
+}
+
+query {
+  nif_medico: 987654321
+  data: 12/07/2024
+  hora: 12:00
+  ssn_paciente: 12345678901
 }

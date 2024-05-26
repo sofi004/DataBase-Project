@@ -196,25 +196,45 @@ def regista_marcacao_clinica(clinica):
         log.error(f"Error registering consultation: {e}")
         return jsonify({"error": "Internal server error"}), 500
 
-@app.route("/a/<clinica>/cancelar/", methods=("GET",))
+@app.route("/a/<clinica>/cancelar/", methods=("DELETE",))
 
 def cancela_consulta(clinica):
     "Cancela uma consulta já marcada"
-    with pool.connection() as conn:
-        with conn.cursor() as cur:
-            especialidades = cur.execute(
-                """
-                SELECT DISTINCT especialidade
-                FROM trabalha t
-                JOIN medico m on m.nif = t.nif
-                JOIN clinica c ON t.nome = c.nome
-                WHERE c.nome = %(clinica)s;
-                """,
-                {"clinica": clinica},
-            ).fetchall()
-            log.debug(f"Found {cur.rowcount} rows.")
+    ssn_paciente = request.args.get("ssn_paciente")
+    nif_medico = request.args.get("nif_medico")
+    data_consulta = request.args.get("data")
+    hora_consulta = request.args.get("hora")
+    if not ssn_paciente or not nif_medico or not data_consulta or not hora_consulta:
+        return jsonify({"error": "Missing required parameters"}), 400
+    try:
+        with pool.connection() as conn:
+            with conn.cursor() as cur:
+                # Verificar se a consulta existe
+                cur.execute(
+                    """
+                    SELECT COUNT(*) FROM consulta c
+                    WHERE c.ssn = %s and c.nif = %s and c.nome = %s and c.data = %s and c.hora = %s
+                    """,
+                    (ssn_paciente, nif_medico, clinica, data_consulta, hora_consulta)
+                )
+                count = cur.fetchone()[0]
 
-    return jsonify(especialidades), 200
+                if count == 0:
+                    return jsonify({"error": "Consulta não encontrada"}), 404
+                cur.execute(
+                    """
+                    
+                    DELETE FROM consulta c
+                    WHERE c.ssn = %s and c.nif = %s and c.nome = %s and c.data = %s and c.hora = %s
+
+                    """,
+                    (ssn_paciente, nif_medico, clinica, data_consulta, hora_consulta),)
+                conn.commit()
+
+                return jsonify({"message": "Consulta apagada com sucesso", "codigo_sns": 0}), 201
+    except Exception as e:
+        log.error(f"Error deleting consultation: {e}")
+        return jsonify({"error": "Internal server error"}), 500
 '''
 @app.route("/", methods=("GET",))
 @app.route("/accounts", methods=("GET",))
