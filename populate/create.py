@@ -201,7 +201,6 @@ while current_date <= fim_2024:
 # Schedule patients consultations
 consultas = []  # Inicialize a lista de consultas
 codigos_consulta = set()  # Conjunto para rastrear códigos de consulta utilizados
-codigos_consulta = set()
 id = 0
 paciente_nr = 0
 while id < 5000:
@@ -286,11 +285,74 @@ for consulta in consultas[:round(len(consultas) * 0.8)]:
 
 
 # Dados para as observações
-observacoes = [
-    {"id_consulta": 1, "parametro": "Pressao arterial", "valor": 120},
-    {"id_consulta": 2, "parametro": "Temperatura", "valor": 37.5},
-    {"id_consulta": 3, "parametro": "Peso", "valor": 70}
-]
+observacoes = []
+
+# Parâmetros para sintomas e métricas
+sintomas_parametros = ["Dor de cabeça", "Febre", "Náusea", "Tontura", "Fadiga", "Dor abdominal",
+"Tosse", "Dor no peito", "Dificuldade para respirar", "Perda de apetite", "Suores noturnos",
+"Inchaço", "Dor nas articulações", "Erupção cutânea", "Calafrios", "Perda de peso", "Palpitações",
+"Diarreia", "Constipação", "Vômito", "Dores musculares", "Olhos vermelhos", "Dor de garganta", "Congestão nasal", 
+"Secreção nasal", "Prurido", "Vertigem", "Dor lombar", "Dificuldade para urinar", "Hemorragia", "Rigidez", "Falta de coordenação",
+"Perda de equilíbrio", "Alteração na visão", "Zumbido no ouvido", "Manchas na pele", "Tremores", "Fraqueza",
+"Ansiedade", "Depressão", "Insônia", "Sonolência excessiva", "Problemas de memória", "Irritabilidade", "Sensibilidade à luz",
+"Dor nos dentes", "Sensação de queimação", "Dor ao engolir", "Formigamento", "Cãibras"]
+
+metricas_parametros = ["Temperatura corporal", "Pressão arterial sistólica", "Pressão arterial diastólica", "Frequência cardíaca",
+"Frequência respiratória", "Saturação de oxigênio", "Nível de glicose no sangue", "Índice de massa corporal", "Peso corporal", 
+"Altura", "Nível de colesterol total", "Nível de HDL", "Nível de LDL", "Triglicerídeos", "Hemoglobina", "Hematócrito", 
+"Leucócitos", "Plaquetas", "Creatinina sérica", "Taxa de filtração glomerular"]
+
+fault_sintomas = copy.deepcopy(sintomas_parametros) 
+fault_metricas = copy.deepcopy(metricas_parametros)
+for consulta in consultas:
+    consulta_id = consulta['id']
+    num_sintomas = random.randint(1, 5)
+    num_metricas = random.randint(0, 3)
+    sintomas_escolhidos = random.sample(sintomas_parametros, num_sintomas)
+    metricas_escolhidas = random.sample(metricas_parametros, num_metricas)
+    for sintoma in sintomas_escolhidos:
+        observacoes.append({
+            "id": consulta_id,
+            "parametro": sintoma,
+            "valor": None  # Sintomas não têm valor
+        })
+        if sintoma in fault_sintomas:
+            fault_sintomas.remove(sintoma)
+    
+    for metrica in metricas_escolhidas:
+        observacoes.append({
+            "id": consulta_id,
+            "parametro": metrica,
+            "valor": round(random.uniform(0, 100), 2)  # Valor aleatório para métricas
+        })
+        if metrica in fault_metricas:
+            fault_metricas.remove(metrica)
+
+# Preencher os parâmetros restantes como sintomas em consultas que ainda têm espaço
+while fault_sintomas:
+    for consulta in consultas:
+        consulta_id = consulta['id']
+        if len([obs for obs in observacoes if obs['id'] == consulta_id and obs['parametro'] in sintomas_parametros]) < 5:
+            sintoma = fault_sintomas.pop()
+            observacoes.append({
+                "id": consulta_id,
+                "parametro": sintoma,
+                "valor": None  # Sintomas não têm valor
+            })
+            break
+
+# Preencher os parâmetros restantes como métricas em consultas que ainda têm espaço
+while fault_metricas:
+    for consulta in consultas:
+        consulta_id = consulta['id']
+        if len([obs for obs in observacoes if obs['id'] == consulta_id and obs['parametro'] in metricas_parametros]) < 3:
+            metrica = fault_metricas.pop()
+            observacoes.append({
+                "id": consulta_id,
+                "parametro": metrica,
+                "valor": round(random.uniform(0, 100), 2)  # Valor aleatório para métricas
+            })
+            break
 
 # Escrever os dados gerados para um arquivo SQL
 with open("dados.sql", "w") as f:
@@ -328,4 +390,4 @@ with open("dados.sql", "w") as f:
 
     # Preencher a tabela observacao
     f.write("INSERT INTO observacao (id, parametro, valor) VALUES\n")
-    f.write(",\n".join(["({}, '{}', {})".format(observacao['id_consulta'], observacao['parametro'], observacao['valor']) for observacao in observacoes]) + ";\n")
+    f.write(",\n".join(["({}, '{}', {})".format(observacao['id'], observacao['parametro'], observacao['valor']) for observacao in observacoes]) + ";\n")
