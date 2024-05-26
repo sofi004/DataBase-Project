@@ -3,11 +3,11 @@ import string
 import datetime
 import copy
 
-# Funçao para gerar números de telefone aleatórios
+# Funçao para gerar números de telefone aleatorios
 def generate_phone_number():
     return ''.join(random.choices(string.digits, k=9))
 
-# Funçao para gerar datas de nascimento aleatórias
+# Funçao para gerar datas de nascimento aleatorias
 def generate_birth_date():
     start_date = datetime.date(1950, 1, 1)
     end_date = datetime.date(2005, 12, 31)
@@ -15,37 +15,37 @@ def generate_birth_date():
 
 # Lista de palavras para o nome da avenida
 avenue_names = [
-    "Liberdade", "São João", "Alegria", "Paz", "Esperança",
+    "Liberdade", "Sao Joao", "Alegria", "Paz", "Esperança",
     "Flor", "Amizade", "Rio", "Sol", "Mar", "Ventura",
     "Primavera", "Felicidade", "Estrada Real", "Montanha",
     "Estrela", "Caminho Verde", "Travessia", "Céu Azul",
     "Jardim", "Cascata", "Lua Cheia", "Horizonte", "Brilho",
-    "Encanto", "Fantasia", "Coração", "Amanhecer", "Sorriso",
+    "Encanto", "Fantasia", "Coraçao", "Amanhecer", "Sorriso",
     "Caminho do Mar", "Fogueira", "Raio de Sol", "Oceano"
 ]
 
-# Dicionário para mapear moradas a códigos postais
+# Dicionario para mapear moradas a codigos postais
 address_postal_dict = {}
 
-# Função para gerar código postal no formato XXXX-XXX
+# Funçao para gerar codigo postal no formato XXXX-XXX
 def generate_postal_code():
     return f"{random.randint(1000, 9999)}-{random.randint(100, 999)}"
 
-# Função para gerar moradas com código postal
+# Funçao para gerar moradas com codigo postal
 def generate_address():
     global address_postal_dict
     address = ' '.join(random.choices(["Rua", "Avenida", "Praceta", "Travessa", "Largo"], k=1)) + ' ' + \
               ' '.join(random.choices(avenue_names, k=1)) + ' ' + \
               ' '.join(random.choices(["Lisboa", "Oeiras", "Cascais", "Loures", "Amadora", "Sintra"], k=1))
     
-    # Verifica se a morada já tem um código postal atribuído
+    # Verifica se a morada ja tem um codigo postal atribuido
     if address not in address_postal_dict:
         address_postal_dict[address] = generate_postal_code()
 
-    # Adicionar código postal
+    # Adicionar codigo postal
     address_with_postal = ' '.join([address, address_postal_dict[address]])
     return address_with_postal
-# Lista de clínicas em diferentes localidades de Lisboa
+# Lista de clinicas em diferentes localidades de Lisboa
 clinicas = [
     {"nome": "Hospital da Luz", "telefone": generate_phone_number(), "morada": generate_address()},
     {"nome": "Hospital de Santa Maria", "telefone": generate_phone_number(), "morada": generate_address()},
@@ -55,7 +55,7 @@ clinicas = [
 ]
 
 # Dados para os enfermeiros
-enfermeiros_por_clinica = 6  # Defina o número desejado de enfermeiros por clínica
+enfermeiros_por_clinica = 6  # Defina o número desejado de enfermeiros por clinica
 enfermeiros = []
 for clinica in clinicas:
     for _ in range(enfermeiros_por_clinica):
@@ -72,7 +72,7 @@ for clinica in clinicas:
 medicos_clinica_geral = []
 medicos_outras_especialidades = []
 
-# Gerar médicos de especialidade 'Clínica Geral'
+# Gerar médicos de especialidade 'Clinica Geral'
 for _ in range(20):
     medicos_clinica_geral.append({
         "nif": ''.join(random.choices(string.digits, k=9)),
@@ -97,7 +97,7 @@ for especialidade in outras_especialidades:
 # Juntar todos os médicos
 medicos = medicos_clinica_geral + medicos_outras_especialidades
 
-# Função para verificar se um médico já está agendado em outra clínica no mesmo dia da semana
+# Funçao para verificar se um médico ja esta agendado em outra clinica no mesmo dia da semana
 def medico_agendado_outro_clinica(medico_nif, clinica, dia_da_semana):
     for outro_dia in clinica:
         if outro_dia != dia_da_semana and medico_nif in clinica[outro_dia]:
@@ -107,9 +107,9 @@ def medico_agendado_outro_clinica(medico_nif, clinica, dia_da_semana):
 # Lista para armazenar dados da tabela 'trabalha'
 trabalha_data = []
 
-# Distribuir os médicos em clínicas e dias da semana, evitando que um médico trabalhe em duas clínicas no mesmo dia
+# Distribuir os médicos em clinicas e dias da semana, evitando que um médico trabalhe em duas clinicas no mesmo dia
 for medico in medicos:
-    # Selecionar aleatoriamente duas clínicas onde o médico trabalhará
+    # Selecionar aleatoriamente duas clinicas onde o médico trabalhara
     clinicas_medico = random.sample(clinicas, 2)
     for clinica in clinicas_medico:
         # Selecionar aleatoriamente um dia da semana
@@ -123,13 +123,13 @@ for medico in medicos:
             "dia_da_semana": dia_da_semana
         })
 
-# Verificar se cada clínica tem pelo menos 8 médicos por dia da semana
+# Verificar se cada clinica tem pelo menos 8 médicos por dia da semana
 for clinica in clinicas:
     # Inicializar a lista para cada dia da semana
     for dia_da_semana in range(1, 8):
         clinica.setdefault(dia_da_semana, [])
     
-    # Verificar se cada clínica tem pelo menos 8 médicos por dia da semana
+    # Verificar se cada clinica tem pelo menos 8 médicos por dia da semana
     for dia_da_semana in range(1, 8):
         while len(clinica[dia_da_semana]) < 8:
             medico = random.choice(medicos)["nif"]
@@ -171,10 +171,10 @@ for _ in range(5000):
         "data_nasc": generate_birth_date()
     })
 
-# Definindo o número mínimo de consultas por médico por dia
+# Definindo o número minimo de consultas por médico por dia
 min_consultas_por_medico = 2
 
-# Definindo o número mínimo de consultas por dia por clínica
+# Definindo o número minimo de consultas por dia por clinica
 min_consultas_por_dia_por_clinica = 20
 
 # Intervalo de tempo para as consultas
@@ -200,7 +200,7 @@ while current_date <= fim_2024:
 
 # Schedule patients consultations
 consultas = []  # Inicialize a lista de consultas
-codigos_consulta = set()  # Conjunto para rastrear códigos de consulta utilizados
+codigos_consulta = set()  # Conjunto para rastrear codigos de consulta utilizados
 id = 0
 paciente_nr = 0
 while id < 5000:
@@ -217,22 +217,22 @@ while id < 5000:
                             break
                         if (trabalha["nome_clinica"] == clinica["nome"]) and (trabalha["dia_da_semana"] == dia):
                             medico = trabalha["nif_medico"]
-                            # Gerar um código único de consulta
+                            # Gerar um codigo único de consulta
                             codigo_sns = ''.join(random.choices(string.digits, k=12))
                             while codigo_sns in codigos_consulta:
                                 codigo_sns = ''.join(random.choices(string.digits, k=12))
-                            # Gerar uma hora aleatória para a consulta
+                            # Gerar uma hora aleatoria para a consulta
                             hora_aleatoria = datetime.time(random.randint(8, 19), random.choice([0, 30]))
 
-                            # Verificar se a hora aleatória está dentro dos intervalos permitidos
+                            # Verificar se a hora aleatoria esta dentro dos intervalos permitidos
                             hora_consulta = None
                             if 8 <= hora_aleatoria.hour < 13 or 14 <= hora_aleatoria.hour < 19:
                                 minutos = hora_aleatoria.minute // 30 * 30  # Ajustar para o intervalo de meia hora
                                 hora_consulta = datetime.time(hora_aleatoria.hour, minutos)
                             else:
-                                # Se estiver fora dos intervalos 8-13 e 14-19 horas, ajuste para o intervalo mais próximo
+                                # Se estiver fora dos intervalos 8-13 e 14-19 horas, ajuste para o intervalo mais proximo
                                 if hora_aleatoria.hour < 8:
-                                    hora_consulta = datetime.time(8, 0)  # Ajuste para o início do intervalo
+                                    hora_consulta = datetime.time(8, 0)  # Ajuste para o inicio do intervalo
                                 elif hora_aleatoria.hour >= 19:
                                     hora_consulta = datetime.time(19, 0)  # Ajuste para o final do intervalo
                                 elif hora_aleatoria.hour >= 13 and hora_aleatoria.hour < 14:
@@ -240,7 +240,6 @@ while id < 5000:
                             if paciente_nr >= 5000:
                                 paciente_nr = 0
                             consultas.append({
-                                "id": id,
                                 "ssn": pacientes[paciente_nr]["ssn"],
                                 "nif_medico": medico,
                                 "nome_clinica": trabalha["nome_clinica"],
@@ -251,10 +250,10 @@ while id < 5000:
                             nr_consultas += 1
                             paciente_nr += 1
                             id += 1
-                            # Adicionar o código de consulta à lista de códigos utilizados
+                            # Adicionar o codigo de consulta à lista de codigos utilizados
                             codigos_consulta.add(codigo_sns)
                     nr_consultas_por_medico += 1
-        # Passar para o próximo dia
+        # Passar para o proximo dia
         current_date += datetime.timedelta(days=1)
     if(id >= 5000):
         break
@@ -268,7 +267,7 @@ receitas = []
 
 # Gerando receitas para ~80% das consultas
 for consulta in consultas[:round(len(consultas) * 0.8)]:
-    codigo_sns = consulta['codigo_sns']  # Supondo que cada consulta tem um código SNS
+    codigo_sns = consulta['codigo_sns']  # Supondo que cada consulta tem um codigo SNS
 
     # Número de medicamentos por receita (entre 1 e 6)
     num_medicamentos = random.randint(1, 6)
@@ -284,28 +283,29 @@ for consulta in consultas[:round(len(consultas) * 0.8)]:
         })
 
 
-# Dados para as observações
+# Dados para as observaçoes
 observacoes = []
 
 # Parâmetros para sintomas e métricas
-sintomas_parametros = ["Dor de cabeça", "Febre", "Náusea", "Tontura", "Fadiga", "Dor abdominal",
+sintomas_parametros = ["Dor de cabeça", "Febre", "Nausea", "Tontura", "Fadiga", "Dor abdominal",
 "Tosse", "Dor no peito", "Dificuldade para respirar", "Perda de apetite", "Suores noturnos",
-"Inchaço", "Dor nas articulações", "Erupção cutânea", "Calafrios", "Perda de peso", "Palpitações",
-"Diarreia", "Constipação", "Vômito", "Dores musculares", "Olhos vermelhos", "Dor de garganta", "Congestão nasal", 
-"Secreção nasal", "Prurido", "Vertigem", "Dor lombar", "Dificuldade para urinar", "Hemorragia", "Rigidez", "Falta de coordenação",
-"Perda de equilíbrio", "Alteração na visão", "Zumbido no ouvido", "Manchas na pele", "Tremores", "Fraqueza",
-"Ansiedade", "Depressão", "Insônia", "Sonolência excessiva", "Problemas de memória", "Irritabilidade", "Sensibilidade à luz",
-"Dor nos dentes", "Sensação de queimação", "Dor ao engolir", "Formigamento", "Cãibras"]
+"Inchaço", "Dor nas articulaçoes", "Erupçao cutânea", "Calafrios", "Perda de peso", "Palpitaçoes",
+"Diarreia", "Constipaçao", "Vomito", "Dores musculares", "Olhos vermelhos", "Dor de garganta", "Congestao nasal", 
+"Secreçao nasal", "Prurido", "Vertigem", "Dor lombar", "Dificuldade para urinar", "Hemorragia", "Rigidez", "Falta de coordenaçao",
+"Perda de equilibrio", "Alteraçao na visao", "Zumbido no ouvido", "Manchas na pele", "Tremores", "Fraqueza",
+"Ansiedade", "Depressao", "Insonia", "Sonolencia excessiva", "Problemas de memoria", "Irritabilidade", "Sensibilidade a luz",
+"Dor nos dentes", "Sensaçao de queimaçao", "Dor ao engolir", "Formigamento", "Caibras"]
 
-metricas_parametros = ["Temperatura corporal", "Pressão arterial sistólica", "Pressão arterial diastólica", "Frequência cardíaca",
-"Frequência respiratória", "Saturação de oxigênio", "Nível de glicose no sangue", "Índice de massa corporal", "Peso corporal", 
-"Altura", "Nível de colesterol total", "Nível de HDL", "Nível de LDL", "Triglicerídeos", "Hemoglobina", "Hematócrito", 
-"Leucócitos", "Plaquetas", "Creatinina sérica", "Taxa de filtração glomerular"]
+metricas_parametros = ["Temperatura corporal", "Pressao arterial sistolica", "Pressao arterial diastolica", "Frequencia cardiaca",
+"Frequencia respiratoria", "Saturaçao de oxigenio", "Nivel de glicose no sangue", "indice de massa corporal", "Peso corporal", 
+"Altura", "Nivel de colesterol total", "Nivel de HDL", "Nivel de LDL", "Triglicerideos", "Hemoglobina", "Hematocrito", 
+"Leucocitos", "Plaquetas", "Creatinina serica", "Taxa de filtraçao glomerular"]
 
 fault_sintomas = copy.deepcopy(sintomas_parametros) 
 fault_metricas = copy.deepcopy(metricas_parametros)
+count = 1
 for consulta in consultas:
-    consulta_id = consulta['id']
+    consulta_id = count
     num_sintomas = random.randint(1, 5)
     num_metricas = random.randint(0, 3)
     sintomas_escolhidos = random.sample(sintomas_parametros, num_sintomas)
@@ -314,7 +314,7 @@ for consulta in consultas:
         observacoes.append({
             "id": consulta_id,
             "parametro": sintoma,
-            "valor": None  # Sintomas não têm valor
+            "valor": None  # Sintomas nao tem valor
         })
         if sintoma in fault_sintomas:
             fault_sintomas.remove(sintoma)
@@ -323,36 +323,11 @@ for consulta in consultas:
         observacoes.append({
             "id": consulta_id,
             "parametro": metrica,
-            "valor": round(random.uniform(0, 100), 2)  # Valor aleatório para métricas
+            "valor": round(random.uniform(0, 100), 2)  # Valor aleatorio para métricas
         })
         if metrica in fault_metricas:
             fault_metricas.remove(metrica)
-
-# Preencher os parâmetros restantes como sintomas em consultas que ainda têm espaço
-while fault_sintomas:
-    for consulta in consultas:
-        consulta_id = consulta['id']
-        if len([obs for obs in observacoes if obs['id'] == consulta_id and obs['parametro'] in sintomas_parametros]) < 5:
-            sintoma = fault_sintomas.pop()
-            observacoes.append({
-                "id": consulta_id,
-                "parametro": sintoma,
-                "valor": None  # Sintomas não têm valor
-            })
-            break
-
-# Preencher os parâmetros restantes como métricas em consultas que ainda têm espaço
-while fault_metricas:
-    for consulta in consultas:
-        consulta_id = consulta['id']
-        if len([obs for obs in observacoes if obs['id'] == consulta_id and obs['parametro'] in metricas_parametros]) < 3:
-            metrica = fault_metricas.pop()
-            observacoes.append({
-                "id": consulta_id,
-                "parametro": metrica,
-                "valor": round(random.uniform(0, 100), 2)  # Valor aleatório para métricas
-            })
-            break
+    count += 1
 
 # Escrever os dados gerados para um arquivo SQL
 with open("dados.sql", "w") as f:
@@ -382,7 +357,7 @@ with open("dados.sql", "w") as f:
 
     # Preencher a tabela consulta
     f.write("INSERT INTO consulta (ssn, nif, nome, data, hora, codigo_sns) VALUES\n")
-    f.write(",\n".join(["('{}', '{}', '{}', '{}', '{}', '{}')".format(consulta['id'], consulta['ssn'], consulta['nif_medico'], consulta['nome_clinica'], consulta['data'], consulta['hora'], consulta['codigo_sns']) for consulta in consultas]) + ";\n")
+    f.write(",\n".join(["('{}', '{}', '{}', '{}', '{}')".format(consulta['ssn'], consulta['nif_medico'], consulta['nome_clinica'], consulta['data'], consulta['hora'], consulta['codigo_sns']) for consulta in consultas]) + ";\n")
     
     # Preencher a tabela receita
     f.write("INSERT INTO receita (codigo_sns, medicamento, quantidade) VALUES\n")
