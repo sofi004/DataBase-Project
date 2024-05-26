@@ -179,7 +179,24 @@ min_consultas_por_dia_por_clinica = 20
 
 # Intervalo de tempo para as consultas
 inicio_2023 = datetime.date(2023, 1, 1)
+inicio_2024 = datetime.date(2024, 1, 1)
 fim_2024 = datetime.date(2024, 12, 31)
+
+horas = [datetime.time(8, 0), datetime.time(8, 30), datetime.time(9, 0), datetime.time(9, 30),
+        datetime.time(10, 0), datetime.time(10, 30), datetime.time(11, 0), datetime.time(11, 30),
+        datetime.time(12, 0), datetime.time(12, 30), datetime.time(14, 0), datetime.time(14, 30),
+        datetime.time(15, 0), datetime.time(15, 30), datetime.time(16, 0), datetime.time(16, 30),
+        datetime.time(17, 0), datetime.time(17, 30), datetime.time(18, 0), datetime.time(18, 30)]
+horarios = []
+current_date = inicio_2024
+while current_date <= fim_2024:
+    for hora_consulta in horas:
+        horarios.append({
+            "data": current_date,
+            "hora": hora_consulta,
+        })
+    current_date += datetime.timedelta(days=1)
+
 
 # Schedule patients consultations
 consultas = []  # Inicialize a lista de consultas
@@ -297,6 +314,10 @@ with open("dados.sql", "w") as f:
     f.write("INSERT INTO paciente (ssn, nif, nome, telefone, morada, data_nasc) VALUES\n")
     f.write(",\n".join(["('{}', '{}', '{}', '{}', '{}', '{}')".format(paciente['ssn'], paciente['nif'], paciente['nome'], paciente['telefone'], paciente['morada'], paciente['data_nasc']) for paciente in pacientes]) + ";\n")
     
+    # Preencher a tabela horario
+    f.write("INSERT INTO horario (data, hora) VALUES\n")
+    f.write(",\n".join(["('{}', '{}')".format(horario['data'], horario['hora'])for horario in horarios]) + ";\n")
+
     # Preencher a tabela consulta
     f.write("INSERT INTO consulta (ssn, nif, nome, data, hora, codigo_sns) VALUES\n")
     f.write(",\n".join(["('{}', '{}', '{}', '{}', '{}', '{}')".format(consulta['id'], consulta['ssn'], consulta['nif_medico'], consulta['nome_clinica'], consulta['data'], consulta['hora'], consulta['codigo_sns']) for consulta in consultas]) + ";\n")
