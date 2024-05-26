@@ -13,13 +13,45 @@ def generate_birth_date():
     end_date = datetime.date(2005, 12, 31)
     return start_date + datetime.timedelta(days=random.randint(0, (end_date - start_date).days))
 
+# Lista de palavras para o nome da avenida
+avenue_names = [
+    "Liberdade", "São João", "Alegria", "Paz", "Esperança",
+    "Flor", "Amizade", "Rio", "Sol", "Mar", "Ventura",
+    "Primavera", "Felicidade", "Estrada Real", "Montanha",
+    "Estrela", "Caminho Verde", "Travessia", "Céu Azul",
+    "Jardim", "Cascata", "Lua Cheia", "Horizonte", "Brilho",
+    "Encanto", "Fantasia", "Coração", "Amanhecer", "Sorriso",
+    "Caminho do Mar", "Fogueira", "Raio de Sol", "Oceano"
+]
+
+# Dicionário para mapear moradas a códigos postais
+address_postal_dict = {}
+
+# Função para gerar código postal no formato XXXX-XXX
+def generate_postal_code():
+    return f"{random.randint(1000, 9999)}-{random.randint(100, 999)}"
+
+# Função para gerar moradas com código postal
+def generate_address():
+    global address_postal_dict
+    address = ' '.join(random.choices(["Rua", "Avenida", "Praceta", "Travessa", "Largo"], k=1)) + ' ' + \
+              ' '.join(random.choices(avenue_names, k=1)) + ' ' + \
+              ' '.join(random.choices(["Lisboa", "Oeiras", "Cascais", "Loures", "Amadora", "Sintra"], k=1))
+    
+    # Verifica se a morada já tem um código postal atribuído
+    if address not in address_postal_dict:
+        address_postal_dict[address] = generate_postal_code()
+
+    # Adicionar código postal
+    address_with_postal = ' '.join([address, address_postal_dict[address]])
+    return address_with_postal
 # Lista de clínicas em diferentes localidades de Lisboa
 clinicas = [
-    {"nome": "Hospital da Luz", "telefone": generate_phone_number(), "morada": "Avenida Almirante Reis, Lisboa"},
-    {"nome": "Hospital de Santa Maria", "telefone": generate_phone_number(), "morada": "Alameda das Linhas de Torres, Lisboa"},
-    {"nome": "Clinica Sao Francisco Xavier", "telefone": generate_phone_number(), "morada": "Estrada Forte do Alto Duque, Oeiras"},
-    {"nome": "Hospital de Cascais", "telefone": generate_phone_number(), "morada": "Rua Doutor Alvaro Esmeriz, Cascais"},
-    {"nome": "Hospital Beatriz Angelo", "telefone": generate_phone_number(), "morada": "Rua Cidade de Bolama, Loures"}
+    {"nome": "Hospital da Luz", "telefone": generate_phone_number(), "morada": generate_address()},
+    {"nome": "Hospital de Santa Maria", "telefone": generate_phone_number(), "morada": generate_address()},
+    {"nome": "Clinica Sao Francisco Xavier", "telefone": generate_phone_number(), "morada": generate_address()},
+    {"nome": "Hospital de Cascais", "telefone": generate_phone_number(), "morada": generate_address()},
+    {"nome": "Hospital Beatriz Angelo", "telefone": generate_phone_number(), "morada": generate_address()}
 ]
 
 # Dados para os enfermeiros
@@ -31,9 +63,7 @@ for clinica in clinicas:
             "nif": ''.join(random.choices(string.digits, k=9)),
             "nome": ' '.join(random.choices(["Ana", "Joao", "Marta", "Pedro", "Sofia", "Tiago", "Ines", "Rui", "Carla", "Miguel"], k=2)),
             "telefone": generate_phone_number(),
-            "morada": ' '.join(random.choices(["Rua", "Avenida", "Praceta", "Travessa", "Largo"], k=1)) + ' ' +
-                      ''.join(random.choices(string.ascii_letters, k=10)) + ', ' +
-                      ' '.join(random.choices(["Lisboa", "Oeiras", "Cascais", "Loures", "Amadora", "Sintra"], k=1)),
+            "morada": generate_address(),
             "nome_clinica": clinica["nome"]
         })
 
@@ -48,9 +78,7 @@ for _ in range(20):
         "nif": ''.join(random.choices(string.digits, k=9)),
         "nome": ' '.join(random.choices(["Andre", "Beatriz", "Carlos", "Diana", "Eduardo", "Francisca", "Gustavo", "Helena", "Ivo", "Joana"], k=2)),
         "telefone": generate_phone_number(),
-        "morada": ' '.join(random.choices(["Rua", "Avenida", "Praceta", "Travessa", "Largo"], k=1)) + ' ' +
-                  ''.join(random.choices(string.ascii_letters, k=10)) + ', ' +
-                  ' '.join(random.choices(["Lisboa", "Oeiras", "Cascais", "Loures", "Amadora", "Sintra"], k=1)),
+        "morada": generate_address(),
         "especialidade": "Clinica Geral"
     })
 
@@ -62,9 +90,7 @@ for especialidade in outras_especialidades:
             "nif": ''.join(random.choices(string.digits, k=9)),
             "nome": ' '.join(random.choices(["Marta", "Ricardo", "Sara", "Tomas", "Vanessa", "Xavier", "Yara", "Ze"], k=2)),
             "telefone": generate_phone_number(),
-            "morada": ' '.join(random.choices(["Rua", "Avenida", "Praceta", "Travessa", "Largo"], k=1)) + ' ' +
-                      ''.join(random.choices(string.ascii_letters, k=10)) + ', ' +
-                      ' '.join(random.choices(["Lisboa", "Oeiras", "Cascais", "Loures", "Amadora", "Sintra"], k=1)),
+            "morada": generate_address(),
             "especialidade": especialidade
         })
 
@@ -141,9 +167,7 @@ for _ in range(5000):
         "nif": ''.join(random.choices(string.digits, k=9)),
         "nome": nome,
         "telefone": generate_phone_number(),
-        "morada": ' '.join(random.choices(["Rua", "Avenida", "Praceta", "Travessa", "Largo"], k=1)) + ' ' +
-                  ''.join(random.choices(string.ascii_letters, k=10)) + ', ' +
-                  ' '.join(random.choices(["Lisboa", "Oeiras", "Cascais", "Loures", "Amadora", "Sintra"], k=1)),
+        "morada": generate_address(),
         "data_nasc": generate_birth_date()
     })
 
@@ -221,11 +245,28 @@ while id < 5000:
 
 
 # Dados para as receitas
-receitas = [
-    {"codigo_sns": "123456789012", "medicamento": "Paracetamol", "quantidade": 2},
-    {"codigo_sns": "234567890123", "medicamento": "Amoxicilina", "quantidade": 1},
-    {"codigo_sns": "345678901234", "medicamento": "Ibuprofeno", "quantidade": 3}
-]
+medicamentos = ["Paracetamol", "Amoxicilina", "Ibuprofeno",
+        "Metformina", "Atorvastatina", "Omeprazol"]
+
+receitas = []
+
+# Gerando receitas para ~80% das consultas
+for consulta in consultas[:round(len(consultas) * 0.8)]:
+    codigo_sns = consulta['codigo_sns']  # Supondo que cada consulta tem um código SNS
+
+    # Número de medicamentos por receita (entre 1 e 6)
+    num_medicamentos = random.randint(1, 6)
+
+    medicamentos_choice = random.sample(medicamentos, num_medicamentos)
+    quantidades = [random.randint(1, 3) for _ in range(num_medicamentos)]
+    
+    for medicamento, quantidade in zip(medicamentos_choice, quantidades):
+        receitas.append({
+            'codigo_sns': codigo_sns,
+            'medicamento': medicamento,
+            'quantidade': quantidade
+        })
+
 
 # Dados para as observações
 observacoes = [
