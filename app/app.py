@@ -100,59 +100,65 @@ def list_especialidades_clinica(clinica):
 
 def list_horarios_medicos_clinica(clinica, especialidade):
     "Lista os médicos da clinia e da especialidade disponiveis"
-    with pool.connection() as conn:
-        with conn.cursor() as cur:
-            especialidades = cur.execute(
-                """
-WITH 
-medicos_clinica AS (
-    SELECT m.nif, m.nome AS nome_medico
-    FROM medico m
-    JOIN trabalha t ON m.nif = t.nif
-    WHERE m.especialidade = %(especialidade)s
-    AND t.nome = %(clinica)s
-),
-horarios_ocupados AS (
-    SELECT nif, data, hora
-    FROM consulta
-),
-horarios_disponiveis AS (
-    SELECT 
-        mc.nif, 
-        mc.nome_medico, 
-        generate_series(current_date, current_date + interval '30 day', interval '1 day')::date AS data,
-        (generate_series(0, 10) * interval '1 hour' + time '08:00:00')::time AS hora
-    FROM medicos_clinica mc
-),
-primeiros_tres_disponiveis AS (
-    SELECT 
-        hd.nif, 
-        hd.nome_medico, 
-        hd.data, 
-        hd.hora,
-        ROW_NUMBER() OVER (PARTITION BY hd.nif ORDER BY hd.data, hd.hora) AS rn
-    FROM horarios_disponiveis hd
-    LEFT JOIN horarios_ocupados ho ON hd.nif = ho.nif AND hd.data = ho.data AND hd.hora = ho.hora
-    WHERE ho.nif IS NULL
-)
-SELECT 
-    nif, 
-    nome_medico, 
-    data, 
-    hora
-FROM 
-    primeiros_tres_disponiveis
-WHERE rn <= 3
-ORDER BY nif, data, hora;
+    try:
+        with pool.connection() as conn:
+            with conn.cursor() as cur:
+                # Verifica se há médicos na clínica e especialidade especificada
+                cur.execute(
+                    """
+                    SELECT m.nif, m.nome AS nome_medico
+                    FROM medico m
+                    JOIN trabalha t ON m.nif = t.nif
+                    WHERE m.especialidade = %(especialidade)s
+                    AND t.nome = %(clinica)s
+                    """,
+                    {"clinica": clinica, "especialidade": especialidade}
+                )
+                medicos_clinica = cur.fetchall()
+                if not medicos_clinica:
+                    raise ValueError("Nenhum médico encontrado para a clínica e especialidade especificada.")
+                medicos_horarios = cur.execute(
+                    """
+                    WITH 
+                    medicos_clinica AS (
+                        SELECT m.nif, m.nome AS nome_medico
+                        FROM medico m
+                        JOIN trabalha t ON m.nif = t.nif
+                        WHERE m.especialidade = %(especialidade)s
+                        AND t.nome = %(clinica)s
+                    ),
+                    horarios_ocupados AS (
+                        SELECT nif, data, hora
+                        FROM consulta c
+                        JOIN medicos_clinica mc ON c.nif = mc.nif
+                        WHERE c.nome = %(clinica)s
+                    ),
+                    horarios_disponiveis AS (
+                        SELECT ho.nif, h.data, h.hora,
+                            ROW_NUMBER() OVER (PARTITION BY ho.nif ORDER BY h.data, h.hora) AS row_num
+                        FROM horario h
+                        JOIN horarios_ocupados ho ON h.data = ho.data
+                        EXCEPT
+                        SELECT ho.data, ho.hora
+                        FROM horarios_ocupados ho
+                    )
+                    SELECT mc.nif, mc.nome_medico, hd.data, hd.hora
+                    FROM medicos_clinica mc
+                    JOIN horarios_disponiveis hd ON mc.nif = hd.nif
+                    WHERE hd.data > current_date AND hd.row_num <= 3
+                    ORDER BY mc.nif, hd.data, hd.hora;
+                    """,
+                    {"clinica": clinica, "especialidade": especialidade},
+                ).fetchall()
+                log.debug(f"Found {cur.rowcount} rows.")
+        return jsonify(medicos_horarios), 200
+    except ValueError as ve:
+        log.warning(f"Validation error: {ve}")
+        return jsonify({"error": str(ve)}), 400
+    except Exception as e:
+        log.error(f"An error occurred: {e}")
+        return jsonify({"error": "An error occurred while fetching the data."}), 500
 
-
-
-                """,
-                {"clinica": clinica, "especialidade": especialidade},
-            ).fetchall()
-            log.debug(f"Found {cur.rowcount} rows.")
-
-    return jsonify(especialidades), 200
 
 
 @app.route("/a/<clinica>/registar/", methods=["PUT", "POST"])
