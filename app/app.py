@@ -104,33 +104,48 @@ def list_horarios_medicos_clinica(clinica, especialidade):
         with conn.cursor() as cur:
             especialidades = cur.execute(
                 """
-                WITH horarios_disponiveis AS (
-                SELECT
-                    m.nome AS nome_medico,
-                    c.data AS data_disponivel,
-                    c.hora AS hora_disponivel
-                FROM
-                    medico m
-                JOIN
-                    trabalha t ON m.nif = t.nif
-                JOIN
-                    clinica cl ON t.nome = cl.nome
-                LEFT JOIN
-                    consulta c ON m.nif = c.nif AND c.data >= CURRENT_DATE AND c.hora >= CURRENT_TIME
-                WHERE
-                    cl.nome = %(clinica)s
-                    AND m.especialidade = %(especialidade)s
-                    AND c.id IS NULL
-                ORDER BY
-                    c.data, c.hora
-            )
-            SELECT
-                nome_medico,
-                data_disponivel,
-                hora_disponivel
-            FROM
-                horarios_disponiveis
-            LIMIT 3;
+WITH 
+medicos_clinica AS (
+    SELECT m.nif, m.nome AS nome_medico
+    FROM medico m
+    JOIN trabalha t ON m.nif = t.nif
+    WHERE m.especialidade = %(especialidade)s
+    AND t.nome = %(clinica)s
+),
+horarios_ocupados AS (
+    SELECT nif, data, hora
+    FROM consulta
+),
+horarios_disponiveis AS (
+    SELECT 
+        mc.nif, 
+        mc.nome_medico, 
+        generate_series(current_date, current_date + interval '30 day', interval '1 day')::date AS data,
+        (generate_series(0, 10) * interval '1 hour' + time '08:00:00')::time AS hora
+    FROM medicos_clinica mc
+),
+primeiros_tres_disponiveis AS (
+    SELECT 
+        hd.nif, 
+        hd.nome_medico, 
+        hd.data, 
+        hd.hora,
+        ROW_NUMBER() OVER (PARTITION BY hd.nif ORDER BY hd.data, hd.hora) AS rn
+    FROM horarios_disponiveis hd
+    LEFT JOIN horarios_ocupados ho ON hd.nif = ho.nif AND hd.data = ho.data AND hd.hora = ho.hora
+    WHERE ho.nif IS NULL
+)
+SELECT 
+    nif, 
+    nome_medico, 
+    data, 
+    hora
+FROM 
+    primeiros_tres_disponiveis
+WHERE rn <= 3
+ORDER BY nif, data, hora;
+
+
 
                 """,
                 {"clinica": clinica, "especialidade": especialidade},
