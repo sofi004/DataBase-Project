@@ -61,7 +61,7 @@ for clinica in clinicas:
     for _ in range(enfermeiros_por_clinica):
         enfermeiros.append({
             "nif": ''.join(random.choices(string.digits, k=9)),
-            "nome": ' '.join(random.choices(["Ana", "Joao", "Marta", "Pedro", "Sofia", "Tiago", "Ines", "Rui", "Carla", "Miguel"], k=2)),
+            "nome": ' '.join(random.choices(["Raimundo", "Sabrina", "Quirino", "Oscar", "Natalia", "Filomena", "Joaquim", "Igor", "Noemi", "Mogli"], k=2)),
             "telefone": generate_phone_number(),
             "morada": generate_address(),
             "nome_clinica": clinica["nome"]
@@ -76,7 +76,7 @@ medicos_outras_especialidades = []
 for _ in range(20):
     medicos_clinica_geral.append({
         "nif": ''.join(random.choices(string.digits, k=9)),
-        "nome": ' '.join(random.choices(["Andre", "Beatriz", "Carlos", "Diana", "Eduardo", "Francisca", "Gustavo", "Helena", "Ivo", "Joana"], k=2)),
+        "nome": ' '.join(random.choices(["Alice", "Denise", "Caio", "Ester", "Fernanda", "Guilherme", "Jonas", "Luan", "Ian", "Thales"], k=2)),
         "telefone": generate_phone_number(),
         "morada": generate_address(),
         "especialidade": "Clinica Geral"
@@ -364,5 +364,18 @@ with open("dados.sql", "w") as f:
     f.write(",\n".join(["('{}', '{}', {})".format(receita['codigo_sns'], receita['medicamento'], receita['quantidade']) for receita in receitas]) + ";\n")
 
     # Preencher a tabela observacao
-    f.write("INSERT INTO observacao (id, parametro, valor) VALUES\n")
-    f.write(",\n".join(["({}, '{}', {})".format(observacao['id'], observacao['parametro'], observacao['valor']) for observacao in observacoes]) + ";\n")
+    sintomas_observacoes = []
+    metricas_observacoes = []
+    for observacao in observacoes:
+        if observacao['valor'] is None:
+            sintomas_observacoes.append("({}, '{}')".format(observacao['id'], observacao['parametro']))
+        else:
+            metricas_observacoes.append("({}, '{}', {})".format(observacao['id'], observacao['parametro'], observacao['valor']))
+
+    if sintomas_observacoes:
+        f.write("INSERT INTO observacao (id, parametro) VALUES\n")
+        f.write(",\n".join(sintomas_observacoes) + ";\n")
+
+    if metricas_observacoes:
+        f.write("INSERT INTO observacao (id, parametro, valor) VALUES\n")
+        f.write(",\n".join(metricas_observacoes) + ";\n")
