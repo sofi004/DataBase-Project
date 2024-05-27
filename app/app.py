@@ -151,6 +151,18 @@ def list_horarios_medicos_clinica(clinica, especialidade):
                     {"clinica": clinica, "especialidade": especialidade},
                 ).fetchall()
                 log.debug(f"Found {cur.rowcount} rows.")
+
+                # Group the schedules by doctor's NIF to check the count
+                from collections import defaultdict
+                horarios_por_medico = defaultdict(list)
+                for nif, nome_medico, data, hora in medicos_horarios:
+                    horarios_por_medico[nif].append((nome_medico, data, hora))
+                
+                # Check if every doctor has at least 3 available schedules
+                for nif, horarios in horarios_por_medico.items():
+                    if len(horarios) < 3:
+                        raise ValueError(f"O médico com NIF {nif} não tem pelo menos 3 horários disponíveis.")
+                    
         return jsonify(medicos_horarios), 200
     except ValueError as ve:
         log.warning(f"Validation error: {ve}")
