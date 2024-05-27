@@ -13,11 +13,6 @@ from psycopg_pool import ConnectionPool
 # Use the DATABASE_URL environment variable if it exists, otherwise use the default.
 # Use the format postgres://username:password@hostname/database_name to connect to the database.
 
-def datetime_handler(x):
-    if isinstance(x, datetime.datetime):
-        return x.isoformat()
-    raise TypeError("Unknown type")
-
 DATABASE_URL = os.environ.get("DATABASE_URL", "postgres://postgres:postgres@postgres/saude")
 
 pool = ConnectionPool(
@@ -67,10 +62,10 @@ def is_decimal(s):
         return False
 
 @app.route("/", methods=("GET",))
-
 def list_clinics():
     "Show all clinics"
-    with pool.connection() as conn:
+    try:
+        with pool.connection() as conn:
             with conn.cursor() as cur:
                 clinics = cur.execute(
                     """
@@ -81,26 +76,59 @@ def list_clinics():
                 ).fetchall()
                 log.debug(f"Found {cur.rowcount} rows.")
 
+        if not clinics:
+            log.error("No clinics found.")
+            raise ValueError("No clinics available to show.")
+
+    except ValueError as e:
+        response = jsonify({'error': str(e)})
+        response.status_code = 404
+        return response
+
     return jsonify(clinics), 200
 
 
 @app.route("/c/<clinica>/", methods=("GET",))
-
 def list_especialidades_clinica(clinica):
     "Mostra as especialidades de uma clinica"
-    with pool.connection() as conn:
-        with conn.cursor() as cur:
-            especialidades = cur.execute(
-                """
-                SELECT DISTINCT especialidade
-                FROM trabalha t
-                JOIN medico m on m.nif = t.nif
-                JOIN clinica c ON t.nome = c.nome
-                WHERE c.nome = %(clinica)s;
-                """,
-                {"clinica": clinica},
-            ).fetchall()
-            log.debug(f"Found {cur.rowcount} rows.")
+    try:
+        with pool.connection() as conn:
+            with conn.cursor() as cur:
+                # Check if the clinic exists
+                clinic_exists = cur.execute(
+                    """
+                    SELECT 1
+                    FROM clinica
+                    WHERE nome = %(clinica)s;
+                    """,
+                    {"clinica": clinica}
+                ).fetchone()
+
+                if not clinic_exists:
+                    log.error(f"Clinic {clinica} does not exist.")
+                    raise ValueError(f"Clinic {clinica} does not exist.")
+
+                # Fetch especialidades if the clinic exists
+                especialidades = cur.execute(
+                    """
+                    SELECT DISTINCT especialidade
+                    FROM trabalha t
+                    JOIN medico m ON m.nif = t.nif
+                    JOIN clinica c ON t.nome = c.nome
+                    WHERE c.nome = %(clinica)s;
+                    """,
+                    {"clinica": clinica}
+                ).fetchall()
+                log.debug(f"Found {cur.rowcount} rows.")
+
+                if not especialidades:
+                    log.error(f"No especialidades found for clinic {clinica}.")
+                    raise ValueError(f"No especialidades found for clinic {clinica}.")
+
+    except ValueError as e:
+        response = jsonify({'error': str(e)})
+        response.status_code = 404
+        return response
 
     return jsonify(especialidades), 200
 
@@ -177,15 +205,19 @@ def list_horarios_medicos_clinica(clinica, especialidade):
 @app.route("/a/<clinica>/registar/", methods=["PUT", "POST"])
 def regista_marcacao_clinica(clinica):
     # Obtém os dados da solicitação
-    
     ssn_paciente = request.args.get("ssn_paciente")
     nif_medico = request.args.get("nif_medico")
     data_consulta = request.args.get("data")
     hora_consulta = request.args.get("hora")
-
     if not ssn_paciente or not nif_medico or not data_consulta or not hora_consulta:
         return jsonify({"error": "Missing required parameters"}), 400
-
+    # Convert data_consulta to a datetime object for comparison
+    data_consulta_dt = datetime.datetime.strptime(data_consulta, '%Y-%m-%d')
+    # Get the current date
+    current_date = datetime.datetime.now().date()
+    # Check if data_consulta is before the current date
+    if data_consulta_dt <= current_date:
+        return jsonify({"error": "Consulta date should be after the current date"}), 400
     try:
         with pool.connection() as conn:
             with conn.cursor() as cur:
@@ -194,29 +226,23 @@ def regista_marcacao_clinica(clinica):
                     SELECT 1 
                     FROM consulta 
                     WHERE nif = %s 
-                      AND data = %s 
-                      AND hora = %s
+                    AND data = %s 
+                    AND hora = %s
                 """, (nif_medico, data_consulta, hora_consulta))
-
                 if cur.fetchone():
                     return jsonify({"error": "O médico não está disponível no horário especificado."}), 409
-
                 # Inserir a nova consulta
                 cur.execute("""
                     INSERT INTO consulta (ssn, nif, nome, data, hora)
                     VALUES (%s, %s, %s, %s, %s)
                 """, (ssn_paciente, nif_medico, clinica, data_consulta, hora_consulta))
-
                 conn.commit()
-
-                return jsonify({"message": "Consulta registrada com sucesso", "codigo_sns": 0}), 201
-
+                return jsonify({"message": "Consulta registrada com sucesso"}), 201
     except Exception as e:
         log.error(f"Error registering consultation: {e}")
         return jsonify({"error": "Internal server error"}), 500
 
 @app.route("/a/<clinica>/cancelar/", methods=("DELETE",))
-
 def cancela_consulta(clinica):
     "Cancela uma consulta já marcada"
     ssn_paciente = request.args.get("ssn_paciente")
@@ -225,6 +251,13 @@ def cancela_consulta(clinica):
     hora_consulta = request.args.get("hora")
     if not ssn_paciente or not nif_medico or not data_consulta or not hora_consulta:
         return jsonify({"error": "Missing required parameters"}), 400
+    # Convert data_consulta to a datetime object for comparison
+    data_consulta_dt = datetime.datetime.strptime(data_consulta, '%Y-%m-%d')
+    # Get the current date
+    current_date = datetime.datetime.now().date()
+    # Check if data_consulta is equal to or older than the current date
+    if data_consulta_dt >= current_date:
+        return jsonify({"error": "Cannot cancel a consulta that has already occurred"}), 400
     try:
         with pool.connection() as conn:
             with conn.cursor() as cur:
@@ -240,49 +273,45 @@ def cancela_consulta(clinica):
 
                 if count == 0:
                     return jsonify({"error": "Consulta não encontrada"}), 404
+
                 cur.execute(
                     """
-                    
+                    SELECT codigo_sns, id
+                    FROM consulta
+                    WHERE ssn = %s AND nif = %s AND nome = %s AND data = %s AND hora = %s
+                    """,
+                    (ssn_paciente, nif_medico, clinica, data_consulta, hora_consulta)
+                )
+                consulta_info = cur.fetchone()
+                codigo_sns = consulta_info[0]
+                id_consulta = consulta_info[1]
+                # Deleting associated Receita records
+                cur.execute(
+                    """
+                    DELETE FROM receita
+                    WHERE codigo_sns = %s
+                    """,
+                    (codigo_sns,)
+                )
+                # Deleting associated Observacao records
+                cur.execute(
+                    """
+                    DELETE FROM observacao
+                    WHERE id_consulta = %s
+                    """,
+                    (id_consulta,)
+                )
+                cur.execute(
+                    """
                     DELETE FROM consulta c
                     WHERE c.ssn = %s and c.nif = %s and c.nome = %s and c.data = %s and c.hora = %s
-
                     """,
                     (ssn_paciente, nif_medico, clinica, data_consulta, hora_consulta),)
                 conn.commit()
-
-                return jsonify({"message": "Consulta apagada com sucesso", "codigo_sns": 0}), 201
+                return jsonify({"message": "Consulta apagada com sucesso"}), 201
     except Exception as e:
         log.error(f"Error deleting consultation: {e}")
         return jsonify({"error": "Internal server error"}), 500
-'''
-@app.route("/", methods=("GET",))
-@app.route("/accounts", methods=("GET",))
-def account_index():
-    """Show all the accounts, most recent first."""
-
-    with pool.connection() as conn:
-        with conn.cursor() as cur:
-            accounts = cur.execute(
-                """
-                SELECT account_number, branch_name, balance
-                FROM account
-                ORDER BY account_number DESC;
-                """,
-                {},
-            ).fetchall()
-            log.debug(f"Found {cur.rowcount} rows.")
-
-    return jsonify(accounts), 200
-
-
-
-
-'''
-@app.route("/ping", methods=("GET",))
-def ping():
-    log.debug("ping!")
-    return jsonify({"message": "pong!", "status": "success"})
-
 
 if __name__ == "__main__":
     app.run()
