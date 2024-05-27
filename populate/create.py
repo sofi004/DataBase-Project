@@ -113,9 +113,9 @@ for medico in medicos:
     clinicas_medico = random.sample(clinicas, 2)
     for clinica in clinicas_medico:
         # Selecionar aleatoriamente um dia da semana
-        dia_da_semana = random.randint(1, 7)
+        dia_da_semana = random.randint(0, 6)
         while medico_agendado_outro_clinica(medico["nif"], clinica, dia_da_semana):
-            dia_da_semana = random.randint(1, 7)
+            dia_da_semana = random.randint(0, 6)
         clinica.setdefault(dia_da_semana, []).append(medico["nif"])
         trabalha_data.append({
             "nif_medico": medico["nif"],
@@ -206,7 +206,7 @@ paciente_nr = 0
 while id < 5000:
     current_date = inicio_2023
     while current_date <= fim_2024:
-        dia = current_date.weekday() + 1
+        dia = current_date.weekday()
         for clinica in clinicas:
             nr_consultas = 0
             while nr_consultas < 20:
