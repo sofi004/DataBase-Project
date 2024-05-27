@@ -2,6 +2,8 @@
 # Copyright (c) BDist Development Team
 # Distributed under the terms of the Modified BSD License.
 import os
+import datetime
+import json
 from logging.config import dictConfig
 
 from flask import Flask, jsonify, request
@@ -10,6 +12,12 @@ from psycopg_pool import ConnectionPool
 
 # Use the DATABASE_URL environment variable if it exists, otherwise use the default.
 # Use the format postgres://username:password@hostname/database_name to connect to the database.
+
+def datetime_handler(x):
+    if isinstance(x, datetime.datetime):
+        return x.isoformat()
+    raise TypeError("Unknown type")
+
 DATABASE_URL = os.environ.get("DATABASE_URL", "postgres://postgres:postgres@postgres/saude")
 
 pool = ConnectionPool(
@@ -99,11 +107,11 @@ def list_especialidades_clinica(clinica):
 @app.route("/c/<clinica>/<especialidade>/", methods=("GET",))
 
 def list_horarios_medicos_clinica(clinica, especialidade):
-    "Lista os médicos da clinia e da especialidade disponiveis"
+    "Lista os médicos da clinica e da especialidade disponiveis"
     try:
         with pool.connection() as conn:
             with conn.cursor() as cur:
-                # Verifica se há médicos na clínica e especialidade especificada
+                                # Verifica se há médicos na clínica e especialidade especificada
                 cur.execute(
                     """
                     SELECT m.nif, m.nome AS nome_medico
@@ -119,39 +127,35 @@ def list_horarios_medicos_clinica(clinica, especialidade):
                     raise ValueError("Nenhum médico encontrado para a clínica e especialidade especificada.")
                 medicos_horarios = cur.execute(
                     """
-                    WITH 
-                    medicos_clinica AS (
+                    WITH medicos_clinica AS (
                         SELECT m.nif, m.nome AS nome_medico
                         FROM medico m
                         JOIN trabalha t ON m.nif = t.nif
-                        WHERE m.especialidade = %(especialidade)s
-                        AND t.nome = %(clinica)s
-                    ),
+                        WHERE m.especialidade = 'Pediatria'
+                        AND t.nome = 'sao_joao'
+                        ),
                     horarios_ocupados AS (
-                        SELECT nif, data, hora
+                        SELECT c.nif, c.data, c.hora
                         FROM consulta c
                         JOIN medicos_clinica mc ON c.nif = mc.nif
-                        WHERE c.nome = %(clinica)s
+                        WHERE c.nome = 'sao_joao'
                     ),
                     horarios_disponiveis AS (
-                        SELECT ho.nif, h.data, h.hora,
-                            ROW_NUMBER() OVER (PARTITION BY ho.nif ORDER BY h.data, h.hora) AS row_num
-                        FROM horario h
-                        JOIN horarios_ocupados ho ON h.data = ho.data
-                        EXCEPT
-                        SELECT ho.data, ho.hora
-                        FROM horarios_ocupados ho
+                        SELECT mc.nif, h.data, h.hora,
+                            ROW_NUMBER() OVER (PARTITION BY mc.nif ORDER BY h.data, h.hora) AS row_num
+                        FROM medicos_clinica mc
+                        CROSS JOIN horario h
+                        LEFT JOIN horarios_ocupados ho ON mc.nif = ho.nif AND h.data = ho.data AND h.hora = ho.hora
+                        WHERE ho.nif IS NULL AND h.data > current_date
                     )
                     SELECT mc.nif, mc.nome_medico, hd.data, hd.hora
                     FROM medicos_clinica mc
                     JOIN horarios_disponiveis hd ON mc.nif = hd.nif
-                    WHERE hd.data > current_date AND hd.row_num <= 3
+                    WHERE hd.row_num <= 3
                     ORDER BY mc.nif, hd.data, hd.hora;
-                    """,
-                    {"clinica": clinica, "especialidade": especialidade},
+                    """
                 ).fetchall()
                 log.debug(f"Found {cur.rowcount} rows.")
-
                 # Group the schedules by doctor's NIF to check the count
                 from collections import defaultdict
                 horarios_por_medico = defaultdict(list)
@@ -162,14 +166,11 @@ def list_horarios_medicos_clinica(clinica, especialidade):
                 for nif, horarios in horarios_por_medico.items():
                     if len(horarios) < 3:
                         raise ValueError(f"O médico com NIF {nif} não tem pelo menos 3 horários disponíveis.")
-                    
-        return jsonify(medicos_horarios), 200
-    except ValueError as ve:
-        log.warning(f"Validation error: {ve}")
-        return jsonify({"error": str(ve)}), 400
+        return jsonify(str(medicos_horarios))
     except Exception as e:
         log.error(f"An error occurred: {e}")
-        return jsonify({"error": "An error occurred while fetching the data."}), 500
+        return jsonify({"Oops": str(e)}), 500
+        #return jsonify({"error": "An error occurred while fetching the data."}), 500
 
 
 
