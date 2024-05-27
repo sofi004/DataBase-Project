@@ -126,11 +126,11 @@ for medico in medicos:
 # Verificar se cada clinica tem pelo menos 8 médicos por dia da semana
 for clinica in clinicas:
     # Inicializar a lista para cada dia da semana
-    for dia_da_semana in range(1, 8):
+    for dia_da_semana in range(0, 7):
         clinica.setdefault(dia_da_semana, [])
     
     # Verificar se cada clinica tem pelo menos 8 médicos por dia da semana
-    for dia_da_semana in range(1, 8):
+    for dia_da_semana in range(0, 7):
         while len(clinica[dia_da_semana]) < 8:
             medico = random.choice(medicos)["nif"]
             if medico not in clinica[dia_da_semana]:
