@@ -141,11 +141,12 @@ for clinica in clinicas:
             medico = random.choice(medicos)["nif"]
             if medico not in clinica[dia_da_semana]:
                 clinica[dia_da_semana].append(medico)
-                trabalha_data.append({
-                    "nif": medico,
-                    "nome": clinica["nome"],
-                    "dia_da_semana": dia_da_semana
-                })
+                if not (medico_agendado_outro_clinica(medico, clinica, dia_da_semana)):
+                    trabalha_data.append({
+                        "nif": medico,
+                        "nome": clinica["nome"],
+                        "dia_da_semana": dia_da_semana
+                    })
 
 # Dados para os pacientes
 pacientes = []
