@@ -52,15 +52,6 @@ app = Flask(__name__)
 app.config.from_prefixed_env()
 log = app.logger
 
-
-def is_decimal(s):
-    """Returns True if string is a parseable float number."""
-    try:
-        float(s)
-        return True
-    except ValueError:
-        return False
-
 @app.route("/", methods=("GET",))
 def list_clinics():
     "Show all clinics"
@@ -153,14 +144,14 @@ def list_horarios_medicos_clinica(clinica, especialidade):
                 medicos_clinica = cur.fetchall()
                 if not medicos_clinica:
                     raise ValueError("Nenhum médico encontrado para a clínica e especialidade especificada.")
-                medicos_horarios = cur.execute(
+                cur.execute(
                     """
                     WITH medicos_clinica AS (
                         SELECT m.nif, m.nome AS nome_medico
                         FROM medico m
                         JOIN trabalha t ON m.nif = t.nif
-                        WHERE m.especialidade = 'Pediatria'
-                        AND t.nome = 'sao_joao'
+                        WHERE m.especialidade = %(especialidade)s
+                        AND t.nome = %(clinica)s
                         ),
                     horarios_ocupados AS (
                         SELECT c.nif, c.data, c.hora
@@ -181,9 +172,11 @@ def list_horarios_medicos_clinica(clinica, especialidade):
                     JOIN horarios_disponiveis hd ON mc.nif = hd.nif
                     WHERE hd.row_num <= 3
                     ORDER BY mc.nif, hd.data, hd.hora;
-                    """
-                ).fetchall()
-                log.debug(f"Found {cur.rowcount} rows.")
+                    """,
+                 {"clinica": clinica, "especialidade": especialidade}
+                 )
+                medicos_horarios = cur.fetchall()
+                log.debug(f"Found {len(medicos_horarios)} rows.")
                 # Group the schedules by doctor's NIF to check the count
                 from collections import defaultdict
                 horarios_por_medico = defaultdict(list)
@@ -212,11 +205,12 @@ def regista_marcacao_clinica(clinica):
     if not ssn_paciente or not nif_medico or not data_consulta or not hora_consulta:
         return jsonify({"error": "Missing required parameters"}), 400
     # Convert data_consulta to a datetime object for comparison
-    data_consulta_dt = datetime.datetime.strptime(data_consulta, '%Y-%m-%d')
+    data_hora_consulta_str = f"{data_consulta} {hora_consulta}"
+    data_hora_consulta_dt = datetime.datetime.strptime(data_hora_consulta_str, '%Y-%m-%d %H:%M')
     # Get the current date
-    current_date = datetime.datetime.now().date()
+    current_date = datetime.datetime.now()
     # Check if data_consulta is before the current date
-    if data_consulta_dt <= current_date:
+    if data_hora_consulta_dt <= current_date:
         return jsonify({"error": "Consulta date should be after the current date"}), 400
     try:
         with pool.connection() as conn:
@@ -252,11 +246,12 @@ def cancela_consulta(clinica):
     if not ssn_paciente or not nif_medico or not data_consulta or not hora_consulta:
         return jsonify({"error": "Missing required parameters"}), 400
     # Convert data_consulta to a datetime object for comparison
-    data_consulta_dt = datetime.datetime.strptime(data_consulta, '%Y-%m-%d')
+    data_hora_consulta_str = f"{data_consulta} {hora_consulta}"
+    data_hora_consulta_dt = datetime.datetime.strptime(data_hora_consulta_str, '%Y-%m-%d %H:%M')
     # Get the current date
-    current_date = datetime.datetime.now().date()
+    current_date = datetime.datetime.now()
     # Check if data_consulta is equal to or older than the current date
-    if data_consulta_dt >= current_date:
+    if data_hora_consulta_dt >= current_date:
         return jsonify({"error": "Cannot cancel a consulta that has already occurred"}), 400
     try:
         with pool.connection() as conn:
