@@ -208,6 +208,7 @@ while current_date <= fim_2024:
 # Schedule patients consultations
 consultas = []  # Inicialize a lista de consultas
 codigos_consulta = set()  # Conjunto para rastrear codigos de consulta utilizados
+criterios_unicos = set()  # Conjunto para rastrear critérios únicos
 id = 0
 paciente_nr = 0
 while id < 5000:
@@ -244,21 +245,27 @@ while id < 5000:
                                     hora_consulta = datetime.time(19, 0)  # Ajuste para o final do intervalo
                                 elif hora_aleatoria.hour >= 13 and hora_aleatoria.hour < 14:
                                     hora_consulta = datetime.time(15, 30)
+
                             if paciente_nr >= 5000:
                                 paciente_nr = 0
-                            consultas.append({
-                                "ssn": pacientes[paciente_nr]["ssn"],
-                                "nif": medico,
-                                "nome": trabalha["nome"],
-                                "data": current_date,
-                                "hora": hora_consulta,
-                                "codigo_sns": codigo_sns
-                            })
-                            nr_consultas += 1
-                            paciente_nr += 1
-                            id += 1
-                            # Adicionar o codigo de consulta à lista de codigos utilizados
-                            codigos_consulta.add(codigo_sns)
+
+                            chave_unica = (medico, current_date, hora_consulta, clinica["nome"])
+                            if chave_unica not in criterios_unicos:
+                                consultas.append({
+                                    "ssn": pacientes[paciente_nr]["ssn"],
+                                    "nif": medico,
+                                    "nome": trabalha["nome"],
+                                    "data": current_date,
+                                    "hora": hora_consulta,
+                                    "codigo_sns": codigo_sns
+                                })
+                                nr_consultas += 1
+                                paciente_nr += 1
+                                id += 1
+                                criterios_unicos.add(chave_unica)
+                                # Adicionar o codigo de consulta à lista de codigos utilizados
+                                codigos_consulta.add(codigo_sns)
+                            
                     nr_consultas_por_medico += 1
         # Passar para o proximo dia
         current_date += datetime.timedelta(days=1)
