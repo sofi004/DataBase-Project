@@ -68,7 +68,7 @@ for clinica in clinicas:
             "nome": nome,
             "telefone": generate_phone_number(),
             "morada": generate_address(),
-            "nome": clinica["nome"]
+            "nome_clinica": clinica["nome"]
         })
 
 
@@ -342,8 +342,8 @@ with open("dados.sql", "w") as f:
     f.write(",\n".join(["('{}', '{}', '{}')".format(clinica['nome'], clinica['telefone'], clinica['morada']) for clinica in clinicas]) + ";\n")
 
     # Preencher a tabela enfermeiro
-    f.write("INSERT INTO enfermeiro (nif, nome, telefone, morada, nome) VALUES\n")
-    f.write(",\n".join(["('{}', '{}', '{}', '{}', '{}')".format(enfermeiro['nif'], enfermeiro['nome'], enfermeiro['telefone'], enfermeiro['morada'], enfermeiro['nome']) for enfermeiro in enfermeiros]) + ";\n")
+    f.write("INSERT INTO enfermeiro (nif, nome, telefone, morada, nome_clinica) VALUES\n")
+    f.write(",\n".join(["('{}', '{}', '{}', '{}', '{}')".format(enfermeiro['nif'], enfermeiro['nome'], enfermeiro['telefone'], enfermeiro['morada'], enfermeiro['nome_clinica']) for enfermeiro in enfermeiros]) + ";\n")
     
     # Preencher a tabela medico
     f.write("INSERT INTO medico (nif, nome, telefone, morada, especialidade) VALUES\n")
