@@ -104,9 +104,9 @@ for especialidade in outras_especialidades:
 medicos = medicos_clinica_geral + medicos_outras_especialidades
 
 # Funçao para verificar se um médico ja esta agendado em outra clinica no mesmo dia da semana
-def medico_agendado_outro_clinica(medico_nif, clinica, dia_da_semana):
+def medico_agendado_outro_clinica(medico_nif, dia_da_semana):
     for trabalho in trabalha_data:
-        if(trabalho["nif"] == medico_nif and trabalho["nome"] == clinica and trabalho["dia_da_semana"] == dia_da_semana):
+        if(trabalho["nif"] == medico_nif and trabalho["dia_da_semana"] == dia_da_semana):
             return True
     return False
 
@@ -120,7 +120,7 @@ for medico in medicos:
     for clinica in clinicas_medico:
         # Selecionar aleatoriamente um dia da semana
         dia_da_semana = random.randint(0, 6)
-        while medico_agendado_outro_clinica(medico["nif"], clinica, dia_da_semana):
+        while medico_agendado_outro_clinica(medico["nif"], dia_da_semana):
             dia_da_semana = random.randint(0, 6)
         clinica.setdefault(dia_da_semana, []).append(medico["nif"])
         trabalha_data.append({
@@ -141,7 +141,7 @@ for clinica in clinicas:
             medico = random.choice(medicos)["nif"]
             if medico not in clinica[dia_da_semana]:
                 clinica[dia_da_semana].append(medico)
-                if not (medico_agendado_outro_clinica(medico, clinica, dia_da_semana)):
+                if not (medico_agendado_outro_clinica(medico, dia_da_semana)):
                     trabalha_data.append({
                         "nif": medico,
                         "nome": clinica["nome"],
