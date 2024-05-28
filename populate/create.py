@@ -68,7 +68,7 @@ for clinica in clinicas:
             "nome": nome,
             "telefone": generate_phone_number(),
             "morada": generate_address(),
-            "nome_clinica": clinica["nome"]
+            "nome": clinica["nome"]
         })
 
 
@@ -105,8 +105,8 @@ medicos = medicos_clinica_geral + medicos_outras_especialidades
 
 # Funçao para verificar se um médico ja esta agendado em outra clinica no mesmo dia da semana
 def medico_agendado_outro_clinica(medico_nif, clinica, dia_da_semana):
-    for outro_dia in clinica:
-        if outro_dia != dia_da_semana and medico_nif in clinica[outro_dia]:
+    for trabalho in trabalha_data:
+        if(trabalho["nif"] == medico_nif and trabalho["nome"] == clinica and trabalho["dia_da_semana"] == dia_da_semana):
             return True
     return False
 
@@ -125,7 +125,7 @@ for medico in medicos:
         clinica.setdefault(dia_da_semana, []).append(medico["nif"])
         trabalha_data.append({
             "nif": medico["nif"],
-            "nome_clinica": clinica["nome"],
+            "nome": clinica["nome"],
             "dia_da_semana": dia_da_semana
         })
 
@@ -143,7 +143,7 @@ for clinica in clinicas:
                 clinica[dia_da_semana].append(medico)
                 trabalha_data.append({
                     "nif": medico,
-                    "nome_clinica": clinica["nome"],
+                    "nome": clinica["nome"],
                     "dia_da_semana": dia_da_semana
                 })
 
@@ -221,7 +221,7 @@ while id < 5000:
                     for trabalha in trabalha_data:
                         if(nr_consultas >= 20):
                             break
-                        if (trabalha["nome_clinica"] == clinica["nome"]) and (trabalha["dia_da_semana"] == dia):
+                        if (trabalha["nome"] == clinica["nome"]) and (trabalha["dia_da_semana"] == dia):
                             medico = trabalha["nif"]
                             # Gerar um codigo único de consulta
                             codigo_sns = ''.join(random.choices(string.digits, k=12))
@@ -248,7 +248,7 @@ while id < 5000:
                             consultas.append({
                                 "ssn": pacientes[paciente_nr]["ssn"],
                                 "nif": medico,
-                                "nome_clinica": trabalha["nome_clinica"],
+                                "nome": trabalha["nome"],
                                 "data": current_date,
                                 "hora": hora_consulta,
                                 "codigo_sns": codigo_sns
@@ -342,16 +342,16 @@ with open("dados.sql", "w") as f:
     f.write(",\n".join(["('{}', '{}', '{}')".format(clinica['nome'], clinica['telefone'], clinica['morada']) for clinica in clinicas]) + ";\n")
 
     # Preencher a tabela enfermeiro
-    f.write("INSERT INTO enfermeiro (nif, nome, telefone, morada, nome_clinica) VALUES\n")
-    f.write(",\n".join(["('{}', '{}', '{}', '{}', '{}')".format(enfermeiro['nif'], enfermeiro['nome'], enfermeiro['telefone'], enfermeiro['morada'], enfermeiro['nome_clinica']) for enfermeiro in enfermeiros]) + ";\n")
+    f.write("INSERT INTO enfermeiro (nif, nome, telefone, morada, nome) VALUES\n")
+    f.write(",\n".join(["('{}', '{}', '{}', '{}', '{}')".format(enfermeiro['nif'], enfermeiro['nome'], enfermeiro['telefone'], enfermeiro['morada'], enfermeiro['nome']) for enfermeiro in enfermeiros]) + ";\n")
     
     # Preencher a tabela medico
     f.write("INSERT INTO medico (nif, nome, telefone, morada, especialidade) VALUES\n")
     f.write(",\n".join(["('{}', '{}', '{}', '{}', '{}')".format(medico['nif'], medico['nome'], medico['telefone'], medico['morada'], medico['especialidade']) for medico in medicos]) + ";\n")
     
     # Preencher a tabela trabalha
-    f.write("INSERT INTO trabalha (nif, nome_clinica, dia_da_semana) VALUES\n")
-    f.write(",\n".join(["('{}', '{}', {})".format(trabalha['nif'], trabalha['nome_clinica'], trabalha['dia_da_semana']) for trabalha in trabalha_data]) + ";\n")
+    f.write("INSERT INTO trabalha (nif, nome, dia_da_semana) VALUES\n")
+    f.write(",\n".join(["('{}', '{}', {})".format(trabalha['nif'], trabalha['nome'], trabalha['dia_da_semana']) for trabalha in trabalha_data]) + ";\n")
 
     # Preencher a tabela paciente
     f.write("INSERT INTO paciente (ssn, nif, nome, telefone, morada, data_nasc) VALUES\n")
@@ -363,7 +363,7 @@ with open("dados.sql", "w") as f:
 
     # Preencher a tabela consulta
     f.write("INSERT INTO consulta (ssn, nif, nome, data, hora, codigo_sns) VALUES\n")
-    f.write(",\n".join(["('{}', '{}', '{}', '{}', '{}', '{}')".format(consulta['ssn'], consulta['nif'], consulta['nome_clinica'], consulta['data'], consulta['hora'], consulta['codigo_sns']) for consulta in consultas]) + ";\n")
+    f.write(",\n".join(["('{}', '{}', '{}', '{}', '{}', '{}')".format(consulta['ssn'], consulta['nif'], consulta['nome'], consulta['data'], consulta['hora'], consulta['codigo_sns']) for consulta in consultas]) + ";\n")
     
     # Preencher a tabela receita
     f.write("INSERT INTO receita (codigo_sns, medicamento, quantidade) VALUES\n")
