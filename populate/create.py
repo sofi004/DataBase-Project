@@ -2,6 +2,8 @@ import random
 import string
 import datetime
 import copy
+import string
+from itertools import combinations
 
 # Funçao para gerar números de telefone aleatorios
 def generate_phone_number():
@@ -53,15 +55,17 @@ clinicas = [
     {"nome": "Hospital de Cascais", "telefone": generate_phone_number(), "morada": generate_address()},
     {"nome": "Hospital Beatriz Angelo", "telefone": generate_phone_number(), "morada": generate_address()}
 ]
-
+nomes_possiveis = ["Raimundo", "Sabrina", "Quirino", "Oscar", "Natalia", "Filomena", "Joaquim", "Igor", "Noemi", "Mogli", "Ulisses", "Ivandro", "Ruben", "Noemi", "Mauro", "Mauricio", "Manel", "Jesus", "Alice", "Denise", "Caio", "Ester", "Fernanda", "Guilherme", "Jonas", "Luan", "Ian", "Thales", "Marcia", "Marcio", "Leonardo", "Leandro", "Viviane", "Iris", "Iara", "Rihana", "Hanna", "Tiara", "Lua", "Sol", "Alina", "Dayo", "Adewale", "Amara", "Amina", "Ayodele", "Chidinma", "Ebele", "Efua", "Esi", "Femi", "Folake", "Imani", "Jabari", "Kowi", "Mandla", "Lulu", "Adebola", "Zola", "Penda", "Talib", "Nyah", "Eshe", "Nkosi", "Simba", "Balu"]
+combinacoes_nomes = list(combinations(nomes_possiveis, 2))
 # Dados para os enfermeiros
 enfermeiros_por_clinica = 6  # Defina o número desejado de enfermeiros por clinica
 enfermeiros = []
 for clinica in clinicas:
     for _ in range(enfermeiros_por_clinica):
+        nome = ' '.join(combinacoes_nomes.pop())
         enfermeiros.append({
             "nif": ''.join(random.choices(string.digits, k=9)),
-            "nome": ' '.join(random.choices(["Raimundo", "Sabrina", "Quirino", "Oscar", "Natalia", "Filomena", "Joaquim", "Igor", "Noemi", "Mogli"], k=2)),
+            "nome": nome,
             "telefone": generate_phone_number(),
             "morada": generate_address(),
             "nome_clinica": clinica["nome"]
@@ -74,9 +78,10 @@ medicos_outras_especialidades = []
 
 # Gerar médicos de especialidade 'Clinica Geral'
 for _ in range(20):
+    nome = ' '.join(combinacoes_nomes.pop())
     medicos_clinica_geral.append({
         "nif": ''.join(random.choices(string.digits, k=9)),
-        "nome": ' '.join(random.choices(["Alice", "Denise", "Caio", "Ester", "Fernanda", "Guilherme", "Jonas", "Luan", "Ian", "Thales"], k=2)),
+        "nome": nome,
         "telefone": generate_phone_number(),
         "morada": generate_address(),
         "especialidade": "Clinica Geral"
@@ -86,9 +91,10 @@ for _ in range(20):
 outras_especialidades = ["Ortopedia", "Cardiologia", "Pediatria", "Ginecologia", "Dermatologia"]
 for especialidade in outras_especialidades:
     for _ in range(8):
+        nome = ' '.join(combinacoes_nomes.pop())
         medicos_outras_especialidades.append({
             "nif": ''.join(random.choices(string.digits, k=9)),
-            "nome": ' '.join(random.choices(["Marta", "Ricardo", "Sara", "Tomas", "Vanessa", "Xavier", "Yara", "Ze"], k=2)),
+            "nome": nome,
             "telefone": generate_phone_number(),
             "morada": generate_address(),
             "especialidade": especialidade
@@ -118,7 +124,7 @@ for medico in medicos:
             dia_da_semana = random.randint(0, 6)
         clinica.setdefault(dia_da_semana, []).append(medico["nif"])
         trabalha_data.append({
-            "nif_medico": medico["nif"],
+            "nif": medico["nif"],
             "nome_clinica": clinica["nome"],
             "dia_da_semana": dia_da_semana
         })
@@ -357,7 +363,7 @@ with open("dados.sql", "w") as f:
 
     # Preencher a tabela consulta
     f.write("INSERT INTO consulta (ssn, nif, nome, data, hora, codigo_sns) VALUES\n")
-    f.write(",\n".join(["('{}', '{}', '{}', '{}', '{}')".format(consulta['ssn'], consulta['nif_medico'], consulta['nome_clinica'], consulta['data'], consulta['hora'], consulta['codigo_sns']) for consulta in consultas]) + ";\n")
+    f.write(",\n".join(["('{}', '{}', '{}', '{}', '{}', '{}')".format(consulta['ssn'], consulta['nif_medico'], consulta['nome_clinica'], consulta['data'], consulta['hora'], consulta['codigo_sns']) for consulta in consultas]) + ";\n")
     
     # Preencher a tabela receita
     f.write("INSERT INTO receita (codigo_sns, medicamento, quantidade) VALUES\n")
