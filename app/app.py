@@ -206,7 +206,7 @@ def regista_marcacao_clinica(clinica):
         return jsonify({"error": "Missing required parameters"}), 400
     # Convert data_consulta to a datetime object for comparison
     data_hora_consulta_str = f"{data_consulta} {hora_consulta}"
-    data_hora_consulta_dt = datetime.datetime.strptime(data_hora_consulta_str, '%Y-%m-%d %H:%M')
+    data_hora_consulta_dt = datetime.datetime.strptime(data_hora_consulta_str, '%Y-%m-%d %H:%M:%S')
     # Get the current date
     current_date = datetime.datetime.now()
     # Check if data_consulta is before the current date
@@ -247,16 +247,16 @@ def cancela_consulta(clinica):
         return jsonify({"error": "Missing required parameters"}), 400
     # Convert data_consulta to a datetime object for comparison
     data_hora_consulta_str = f"{data_consulta} {hora_consulta}"
-    data_hora_consulta_dt = datetime.datetime.strptime(data_hora_consulta_str, '%Y-%m-%d %H:%M')
+    data_hora_consulta_dt = datetime.datetime.strptime(data_hora_consulta_str, '%Y-%m-%d %H:%M:%S')
     # Get the current date
     current_date = datetime.datetime.now()
     # Check if data_consulta is equal to or older than the current date
-    if data_hora_consulta_dt >= current_date:
+    if data_hora_consulta_dt <= current_date:
         return jsonify({"error": "Cannot cancel a consulta that has already occurred"}), 400
     try:
         with pool.connection() as conn:
             with conn.cursor() as cur:
-                # Verificar se a consulta existe
+                 # Verificar se a consulta existe
                 cur.execute(
                     """
                     SELECT COUNT(*) FROM consulta c
@@ -271,28 +271,31 @@ def cancela_consulta(clinica):
 
                 cur.execute(
                     """
-                    SELECT codigo_sns, id
-                    FROM consulta
-                    WHERE ssn = %s AND nif = %s AND nome = %s AND data = %s AND hora = %s
+                    SELECT c.codigo_sns, c.id
+                    FROM consulta c
+                    WHERE c.ssn = %s AND c.nif = %s AND c.nome = %s AND c.data = %s AND c.hora = %s
                     """,
                     (ssn_paciente, nif_medico, clinica, data_consulta, hora_consulta)
                 )
                 consulta_info = cur.fetchone()
                 codigo_sns = consulta_info[0]
                 id_consulta = consulta_info[1]
+
+                print(codigo_sns, id_consulta)
+
                 # Deleting associated Receita records
                 cur.execute(
                     """
-                    DELETE FROM receita
-                    WHERE codigo_sns = %s
+                    DELETE FROM receita r
+                    WHERE r.codigo_sns = %s
                     """,
                     (codigo_sns,)
                 )
                 # Deleting associated Observacao records
                 cur.execute(
                     """
-                    DELETE FROM observacao
-                    WHERE id_consulta = %s
+                    DELETE FROM observacao o
+                    WHERE o.id = %s
                     """,
                     (id_consulta,)
                 )
@@ -301,9 +304,10 @@ def cancela_consulta(clinica):
                     DELETE FROM consulta c
                     WHERE c.ssn = %s and c.nif = %s and c.nome = %s and c.data = %s and c.hora = %s
                     """,
-                    (ssn_paciente, nif_medico, clinica, data_consulta, hora_consulta),)
+                    (ssn_paciente, nif_medico, clinica, data_consulta, hora_consulta)
+                )
                 conn.commit()
-                return jsonify({"message": "Consulta apagada com sucesso"}), 201
+                return jsonify({"message": "Consulta apagada com sucesso"}), 200
     except Exception as e:
         log.error(f"Error deleting consultation: {e}")
         return jsonify({"error": "Internal server error"}), 500
