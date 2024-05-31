@@ -36,16 +36,22 @@ def generate_postal_code():
 # Funçao para gerar moradas com codigo postal
 def generate_address():
     global address_postal_dict
-    address = ' '.join(random.choices(["Rua", "Avenida", "Praceta", "Travessa", "Largo"], k=1)) + ' ' + \
-              ' '.join(random.choices(avenue_names, k=1)) + ' ' + \
-              ' '.join(random.choices(["Lisboa", "Oeiras", "Cascais", "Loures", "Amadora", "Sintra"], k=1))
+    tipo_rua = random.choices(["Rua", "Avenida", "Praceta", "Travessa", "Largo"], k=1)
+    avenue = random.choices(avenue_names, k=1)
+    city = random.choices(["Lisboa", "Oeiras", "Cascais", "Loures", "Amadora", "Sintra"], k=1)
+    address = ' '.join(tipo_rua) + ' ' + \
+              ' '.join(avenue) + ' ' + \
+              ' '.join(city)
     
     # Verifica se a morada ja tem um codigo postal atribuido
     if address not in address_postal_dict:
         address_postal_dict[address] = generate_postal_code()
 
     # Adicionar codigo postal
-    address_with_postal = ' '.join([address, address_postal_dict[address]])
+    address_with_postal = ' '.join(tipo_rua) + ' ' + \
+                            ' '.join(avenue) + ' ' + \
+                            ' '.join(address_postal_dict[address]) + ' ' + \
+                            ' '.join(city)
     return address_with_postal
 # Lista de clinicas em diferentes localidades de Lisboa
 clinicas = [
